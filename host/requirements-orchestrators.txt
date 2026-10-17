@@ -54,8 +54,9 @@ langsmith==0.14.8 \
     --hash=sha256:bda7ec3d74bc5af3244c90920e924efcf99a700638860bf87d0231bfdb4f4ce4
 nexus-rpc==1.4.0 \
     --hash=sha256:14c953d3519113f8ccec533a9efdb6b10c28afef75d11cdd6d422640c40b3a49
-openai==3.29.0 \
-    --hash=sha256:860d3bad424c5d38cd9ba0a0a2050d558b58ce027596a39f9ccbc0f51a2090b7
+openai==3.31.0 \
+    --hash=sha256:58110edba9acaf29cb2a675a1cbcccdd9f2fdb4932baed474dc847a7639e5d02 \
+    --hash=sha256:e5839f6670483f368de40ce3422f524c1afaf12ff8660539f53489e200db8d78
 orjson==3.13.0 \
     --hash=sha256:58a9619d88f8818d9ab6b39d70d203789457ba13c1ed5d274f33ce9ae7e81a36 \
     --hash=sha256:c749ab3ac30b5ab1ffb7677f8b92eacfdfdc5260210baa398f845bc3714c05d8
