@@ -149,7 +149,7 @@ jobs:
               output.write("input=" + binding["scanner_input"] + "\n")
           PY
       - name: Scan the release runtime manifest
-        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e
+        uses: aquasecurity/trivy-action@6abccf398f78b4c337599c0656f933d91efb91a0
         with:
           version: v0.75.0
           input: ${{ steps.scanner.outputs.input }}
@@ -160,7 +160,7 @@ jobs:
           format: json
           output: release-audit.json
       - name: Generate release SBOM
-        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e
+        uses: aquasecurity/trivy-action@6abccf398f78b4c337599c0656f933d91efb91a0
         with:
           version: v0.75.0
           input: ${{ steps.scanner.outputs.input }}
