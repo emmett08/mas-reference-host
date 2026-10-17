@@ -1,0 +1,51 @@
+{
+  "format": "mas-workflow/1",
+  "limits": {
+    "max_calls": 20,
+    "max_parallel": 2,
+    "max_reserved_microusd": 0,
+    "max_steps": 64,
+    "wall_seconds": 180
+  },
+  "name": "text-pipeline",
+  "root": {
+    "kind": "sequence",
+    "steps": [
+      {
+        "kind": "task",
+        "workflow": "text-normalise"
+      },
+      {
+        "condition": {
+          "equals": true,
+          "path": [
+            "uppercase"
+          ]
+        },
+        "else": {
+          "kind": "task",
+          "workflow": "text-identity"
+        },
+        "kind": "choose",
+        "then": {
+          "kind": "task",
+          "workflow": "text-upper"
+        }
+      },
+      {
+        "branches": {
+          "reverse": {
+            "kind": "task",
+            "workflow": "text-reverse"
+          },
+          "summary": {
+            "kind": "task",
+            "workflow": "text-summary"
+          }
+        },
+        "kind": "parallel"
+      }
+    ]
+  },
+  "version": "1"
+}

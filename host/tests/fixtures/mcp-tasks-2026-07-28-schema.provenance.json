@@ -1,0 +1,8 @@
+{
+  "source": "https://raw.githubusercontent.com/modelcontextprotocol/ext-tasks/main/schema/2026-07-28/schema.json",
+  "protocol_version": "2026-07-28",
+  "sha256": "bf30afb7ac251e3e22c037b7a685f60ef6603031b5484c0d08b1fa0bbe86d460",
+  "retrieved": "2026-10-14",
+  "license": "Apache-2.0",
+  "license_source": "https://raw.githubusercontent.com/modelcontextprotocol/ext-tasks/main/LICENSE"
+}

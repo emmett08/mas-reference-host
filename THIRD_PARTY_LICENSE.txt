@@ -1,0 +1,64 @@
+MIT License
+
+Copyright (c) 2026 Emmett Miller
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Optional Cursor integration
+--------------------------
+The optional Dockerfile.cursor installs cursor-sdk 1.0.37, distributed by
+Anysphere Inc. under its own proprietary licence. Its installed wheel retains
+LICENSE.md: "© Anysphere Inc. All rights reserved. Use is subject to Cursor's
+Terms of Service." See https://cursor.com/terms-of-service.
+This repository's licence does not replace the SDK's separate terms. The
+standard release image does not contain the optional Cursor SDK.
+
+Node.js runtime for the optional Cursor integration
+-------------------------------------------------
+The optional runtime replaces the Node executable bundled with cursor-sdk
+1.0.37 with the SHA-256-locked official Node.js 24.21.0 distribution for Linux
+x64 or arm64. Node.js is distributed under the MIT licence and includes
+third-party components with their own notices. The installer retains the
+distribution's complete LICENSE file at cursor_sdk/_vendor/bridge/NODE_LICENSE
+inside the installed Python package. See https://nodejs.org/ and the retained
+file for the applicable notices. This replacement does not change the Cursor
+SDK's separate terms.
+
+Local Cursor bridge dependency repair
+------------------------------------
+scripts/install-cursor-runtime.py also modifies the bundled
+@connectrpc/connect-node CommonJS and ES module Headers polyfills to use the
+pinned Node runtime's native Headers implementation, and updates that package's
+dependency metadata. Its existing upstream licence notices are retained. The
+installer removes the now-unused undici and @fastify/busboy package trees and
+updates the Python wheel's RECORD to describe the actual installed files.
+The reviewed input and output hashes are recorded in
+host/mas_host/cursor_bridge_patch.json. These are local integration changes,
+not an upstream Cursor SDK release.
+
+Protocol conformance fixtures
+-----------------------------
+host/tests/fixtures retains the official MCP 2026-07-28 core and Tasks extension
+JSON Schemas and A2A v1.0.1 generated JSON Schema for offline interoperability tests. Adjacent
+provenance files identify each source and SHA-256 digest. The complete MCP
+upstream licensing-transition notice (Apache-2.0 for new contributions, retained
+MIT terms for earlier contributions covered by that notice) is preserved in
+mcp-schema-LICENSE. The Tasks extension's Apache-2.0 licence accompanies its
+schema fixture. The complete A2A Apache-2.0 licence is preserved in
+A2A-LICENSE.txt. These fixtures and notices retain their upstream terms.

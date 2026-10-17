@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "mode": "mock",
+  "public_url": "http://127.0.0.1:8765",
+  "allowed_hosts": ["127.0.0.1:8765", "localhost:8765"],
+  "grants": {"example-client": ["invoice_star"]},
+  "auth": {"type": "static", "file": "/run/secrets/bridge_credentials"}
+}

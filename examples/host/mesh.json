@@ -1,0 +1,16 @@
+{
+  "name": "compose-mesh",
+  "description": "Two replaceable inference agents and an exact Python checker communicate over all six directed edges of a logical mesh.",
+  "agents": ["planner", "reviewer", "checker"],
+  "edges": [
+    ["checker", "planner"], ["planner", "checker"],
+    ["planner", "reviewer"], ["reviewer", "planner"],
+    ["reviewer", "checker"], ["checker", "reviewer"]
+  ],
+  "application": "agent-task/1",
+  "mailbox_capacity": 8,
+  "max_messages": 30,
+  "max_bytes": 131072,
+  "max_calls": 4,
+  "wall_seconds": 180
+}

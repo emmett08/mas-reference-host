@@ -1,0 +1,26 @@
+{
+  "format": "mas-workflow/1",
+  "limits": {
+    "max_calls": 20,
+    "max_parallel": 2,
+    "max_reserved_microusd": 0,
+    "max_steps": 64,
+    "wall_seconds": 180
+  },
+  "name": "bounded-increment",
+  "root": {
+    "body": {
+      "kind": "task",
+      "workflow": "arithmetic-increment"
+    },
+    "kind": "loop",
+    "max_iterations": 5,
+    "until": {
+      "equals": true,
+      "path": [
+        "done"
+      ]
+    }
+  },
+  "version": "1"
+}

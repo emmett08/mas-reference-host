@@ -1,0 +1,32 @@
+{
+  "format": "mas-cursor-bridge-patch/1",
+  "patch": "native-headers/1",
+  "sdk_version": "1.0.37",
+  "connect_node_version": "1.6.1",
+  "minimum_node_version": "24.21.0",
+  "files": {
+    "node_modules/@connectrpc/connect-node/dist/cjs/node-headers-polyfill.js": {
+      "before_sha256": "0dcca3713e0e64030e8db6740d98f3a60f5e698831c64933260fccaf818866ec",
+      "after_sha256": "9349e0001851ee06e02fd7fb5c9e8130eea798d068cafe3106d80be668f25a02",
+      "after": "\"use strict\";\n// Copyright 2021-2024 The Connect Authors\n//\n// Licensed under the Apache License, Version 2.0 (the \"License\");\n// you may not use this file except in compliance with the License.\n// You may obtain a copy of the License at\n//\n//      http://www.apache.org/licenses/LICENSE-2.0\n//\n// Unless required by applicable law or agreed to in writing, software\n// distributed under the License is distributed on an \"AS IS\" BASIS,\n// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n// See the License for the specific language governing permissions and\n// limitations under the License.\nObject.defineProperty(exports, \"__esModule\", { value: true });\n// MAS native-headers/1: the host pins Node 24; legacy polyfills are excluded.\nif (Number(process.versions.node.split(\".\")[0]) < 18 ||\n    typeof globalThis.Headers !== \"function\") {\n    throw new Error(\"MAS Cursor bridge requires native Node Headers\");\n}\n"
+    },
+    "node_modules/@connectrpc/connect-node/dist/esm/node-headers-polyfill.js": {
+      "before_sha256": "e09b936dd5015d5deec18defe44fe3423ce9ee19eae6d8b8c0e90b185f8fcae2",
+      "after_sha256": "8d9ca679743a62a6bdbd2c495343aa6d4ef0656324dd2699cc8ce27eabea83bc",
+      "after": "// Copyright 2021-2024 The Connect Authors\n//\n// Licensed under the Apache License, Version 2.0 (the \"License\");\n// you may not use this file except in compliance with the License.\n// You may obtain a copy of the License at\n//\n//      http://www.apache.org/licenses/LICENSE-2.0\n//\n// Unless required by applicable law or agreed to in writing, software\n// distributed under the License is distributed on an \"AS IS\" BASIS,\n// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n// See the License for the specific language governing permissions and\n// limitations under the License.\n// MAS native-headers/1: the host pins Node 24; legacy polyfills are excluded.\nif (Number(process.versions.node.split(\".\")[0]) < 18 ||\n    typeof globalThis.Headers !== \"function\") {\n    throw new Error(\"MAS Cursor bridge requires native Node Headers\");\n}\n"
+    },
+    "node_modules/@connectrpc/connect-node/package.json": {
+      "before_sha256": "9fcd8e7e6c8fb9129faf0c414e28efa014cd490958dc9510c9c7a45a09bbd884",
+      "after_sha256": "3356d5046386b5008bf373829514d2207fe6a8e8b0fcc0a071c020d518d2e608",
+      "after": "{\n  \"name\": \"@connectrpc/connect-node\",\n  \"version\": \"1.6.1\",\n  \"license\": \"Apache-2.0\",\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"https://github.com/connectrpc/connect-es.git\",\n    \"directory\": \"packages/connect-node\"\n  },\n  \"scripts\": {\n    \"prebuild\": \"rm -rf ./dist/*\",\n    \"build\": \"npm run build:cjs && npm run build:esm\",\n    \"build:cjs\": \"tsc --project tsconfig.build.json --module commonjs --moduleResolution node10 --verbatimModuleSyntax false --outDir ./dist/cjs --declaration --declarationDir ./dist/cjs && echo >./dist/cjs/package.json '{\\\"type\\\":\\\"commonjs\\\"}'\",\n    \"build:esm\": \"tsc --project tsconfig.build.json --outDir ./dist/esm --declaration --declarationDir ./dist/esm\",\n    \"test\": \"jasmine --config=jasmine.json\",\n    \"conformance:server\": \"tsc --noEmit && connectconformance --mode server --conf ./conformance/conformance-node.yaml -v -- tsx ./conformance/server.ts\",\n    \"conformance:client\": \"tsc --noEmit && connectconformance --mode client --conf ./conformance/conformance-node.yaml -v -- tsx ./conformance/client.ts\",\n    \"format\": \"prettier --write --ignore-unknown '.' '!dist'\",\n    \"license-header\": \"license-header\",\n    \"lint\": \"eslint --max-warnings 0 .\",\n    \"attw\": \"attw --pack\"\n  },\n  \"type\": \"module\",\n  \"main\": \"./dist/cjs/index.js\",\n  \"exports\": {\n    \".\": {\n      \"import\": \"./dist/esm/index.js\",\n      \"require\": \"./dist/cjs/index.js\"\n    }\n  },\n  \"engines\": {\n    \"node\": \">=24.21.0\"\n  },\n  \"peerDependencies\": {\n    \"@bufbuild/protobuf\": \"^1.10.0\",\n    \"@connectrpc/connect\": \"1.6.1\"\n  },\n  \"devDependencies\": {\n    \"@types/jasmine\": \"^5.0.0\",\n    \"jasmine\": \"^5.2.0\",\n    \"@connectrpc/connect-conformance\": \"^1.6.1\"\n  },\n  \"masRuntimePatch\": \"native-headers/1\"\n}\n"
+    }
+  },
+  "remove": {
+    "node_modules/undici": {
+      "tree_sha256": "3636d62064d1a10ea31dc1ddfc187f0cd853c972ff0f9becce468dbd1dd33b50"
+    },
+    "node_modules/@fastify/busboy": {
+      "tree_sha256": "0ca9fae24df196081a466515c83573d43c3d0652324edcc8857b22cfd1262ff9"
+    }
+  }
+}
