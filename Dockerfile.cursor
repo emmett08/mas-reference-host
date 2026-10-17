@@ -1,0 +1,83 @@
+# Optional, user-built glibc runtime for Cursor's platform-specific SDK bridge.
+# The standard OpenAI/mock image remains the smaller Alpine Dockerfile.
+FROM python:3.14-alpine@sha256:f6a589d43c42b9e7f7dc67a12d37132491f362859a5d750607710cc56da3bc72 AS alpine-packages
+ARG TARGETARCH
+COPY docker/alpine-packages.json /build/alpine-packages.json
+COPY scripts/release-apk.py /build/release-apk.py
+RUN python /build/release-apk.py --lock /build/alpine-packages.json --arch "$TARGETARCH" --out /packages
+
+FROM rust:1.99.0-alpine@sha256:0cce0a5e0e8ba67b455257a3a02a1d99005f382748789d6464460028810f1627 AS rust-build
+COPY --from=alpine-packages /packages/build /packages
+RUN --network=none apk add --no-network /packages/*.apk && rm -rf /packages
+# Keep the Rust binaries independent of the glibc host. SQLite is the bundled,
+# Cargo.lock-pinned library; the standard image deliberately uses shared SQLite.
+ENV RUSTFLAGS="-C target-feature=+crt-static"
+WORKDIR /build/rust-protocol
+COPY .protocol/rust-protocol/Cargo.toml .protocol/rust-protocol/Cargo.lock ./
+COPY .protocol/rust-protocol/src ./src
+RUN cargo build --locked --release --bin mas --bin mas-gateway
+
+FROM python:3.14.8-slim-trixie@sha256:a2b82f3c48559aa0a8446d9af49826b6e2b2016f4cd2afabfe6013ec53729170 AS python-build
+ARG TARGETARCH
+COPY docker/wolfi-packages.json /build/wolfi-packages.json
+COPY docker/wolfi-indexes /build/docker/wolfi-indexes
+COPY scripts/release-wolfi.py /build/release-wolfi.py
+RUN python /build/release-wolfi.py --lock /build/wolfi-packages.json --index-root /build --arch "$TARGETARCH" --out /packages
+COPY host/mas_host/cursor_runtime.json /build/cursor_runtime.json
+COPY scripts/install-cursor-runtime.py /build/install-cursor-runtime.py
+RUN python /build/install-cursor-runtime.py --lock /build/cursor_runtime.json --arch "$TARGETARCH" --out /cursor-node
+WORKDIR /build/host
+COPY host/pyproject.toml host/requirements-cursor.txt host/requirements-bridges.txt host/requirements-build.txt ./
+RUN python -m pip install --no-cache-dir --require-hashes -r requirements-build.txt \
+    && python -m pip download --no-cache-dir --require-hashes --dest /wheels -r requirements-cursor.txt -r requirements-bridges.txt
+COPY host/LICENSE ./LICENSE
+COPY host/mas_host ./mas_host
+ARG MAS_SOURCE_COMMIT=""
+ARG MAS_RELEASE_TAG=""
+COPY --from=rust-build /build/rust-protocol/target/release/mas /build/binaries/mas
+COPY --from=rust-build /build/rust-protocol/target/release/mas-gateway /build/binaries/mas-gateway
+COPY .protocol/rust-protocol/Cargo.toml /build/rust-Cargo.toml
+COPY scripts/write-runtime-provenance.py /build/write-runtime-provenance.py
+COPY .protocol-revision /build/protocol-revision.txt
+RUN --network=none python /build/write-runtime-provenance.py --host /build/host --rust-manifest /build/rust-Cargo.toml --binaries /build/binaries --source-commit "$MAS_SOURCE_COMMIT" --release-tag "$MAS_RELEASE_TAG" --protocol-revision-file /build/protocol-revision.txt
+RUN --network=none python -m pip wheel --no-cache-dir --no-index --no-deps --no-build-isolation --wheel-dir /wheels . \
+    && python -c 'from pathlib import Path; import hashlib; p=next(Path("/wheels").glob("mas_host-*.whl")); Path("/wheels/host-wheel.txt").write_text(str(p)+" --hash=sha256:"+hashlib.sha256(p.read_bytes()).hexdigest()+"\n")'
+RUN --network=none python -m pip install --no-cache-dir --no-index --find-links=/wheels --target=/runtime-python --require-hashes -r requirements-cursor.txt -r requirements-bridges.txt \
+    && python -m pip install --no-cache-dir --no-index --no-deps --target=/runtime-python --require-hashes -r /wheels/host-wheel.txt \
+    && PYTHONPATH=/runtime-python python -m pip check \
+    && PYTHONPATH=/runtime-python python /build/install-cursor-runtime.py --lock /build/cursor_runtime.json --source /cursor-node \
+    && PYTHONPATH=/runtime-python python -c 'from pathlib import Path; import cursor_sdk; p=Path(cursor_sdk.__file__).parent/"_vendor"/"bridge"/"bin"; [(p/n).chmod(0o755) for n in ("node", "cursor-sdk-bridge")]' \
+    && mv /runtime-python/bin /runtime-bin
+
+FROM cgr.dev/chainguard/wolfi-base@sha256:256c88bb066424045021090932d50be93c8e3f2ce3586707702a401b146f3e43
+USER 0:0
+LABEL org.opencontainers.image.source="https://github.com/emmett08/mas-reference-host"
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/usr/local/bin:/usr/lib/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin" \
+    MAS_BIN=/usr/local/bin/mas \
+    MAS_GATEWAY_BIN=/usr/local/bin/mas-gateway \
+    MAS_MODE=mock \
+    MAS_STATE_DIR=/state \
+    MAS_TOPOLOGY=/app/examples/host/mesh.json
+COPY --from=python-build /packages /packages
+RUN --network=none xargs apk --no-network --repositories-file=/dev/null --repository=file:///packages add < /packages/roots.txt \
+    && rm -rf /packages
+RUN addgroup -g 10001 mas \
+    && adduser -D -H -u 10001 -G mas -h /state mas \
+    && mkdir -p /state /app/examples /usr/local/bin \
+    && chown mas:mas /state \
+    && chmod 0700 /state \
+    && ln -s /usr/bin/python3.14 /usr/local/bin/python
+COPY --from=rust-build /build/rust-protocol/target/release/mas /usr/local/bin/mas
+COPY --from=rust-build /build/rust-protocol/target/release/mas-gateway /usr/local/bin/mas-gateway
+COPY --from=python-build /runtime-python /usr/lib/python3.14/site-packages
+# pip --target records console scripts relative to site-packages as ../../bin.
+COPY --from=python-build /runtime-bin /usr/lib/bin
+RUN --network=none python -c 'import importlib.util, shutil; from pathlib import Path; s=importlib.util.find_spec("ensurepip"); shutil.rmtree(s.submodule_search_locations[0]) if s else None; p=Path("/usr/share/python-wheels"); shutil.rmtree(p) if p.exists() else None; assert importlib.util.find_spec("pip") is None'
+COPY examples/host/mesh.json /app/examples/host/mesh.json
+COPY examples/bridges /app/examples/bridges
+COPY LICENSE THIRD_PARTY_LICENSE.txt /usr/share/doc/mas/
+WORKDIR /app
+USER 10001:10001
+ENTRYPOINT ["python", "-m", "mas_host"]

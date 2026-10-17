@@ -1,0 +1,23 @@
+# Explicit opt-in to paid API calls. Export OPENAI_API_KEY on the host.
+# Compose creates a private file, not the key in the container environment.
+services:
+  mesh:
+    # Compose copies environment-backed secrets into the container rootfs.
+    # Its implementation rejects them when read_only is true.
+    read_only: false
+    environment:
+      MAS_MODE: openai
+      MAS_CALL_RESERVATION_MICROUSD: ${MAS_CALL_RESERVATION_MICROUSD:-100000}
+      MAS_PLANNER_RESERVATION_MICROUSD: ${MAS_PLANNER_RESERVATION_MICROUSD:-${MAS_CALL_RESERVATION_MICROUSD:-100000}}
+      MAS_REVIEWER_RESERVATION_MICROUSD: ${MAS_REVIEWER_RESERVATION_MICROUSD:-${MAS_CALL_RESERVATION_MICROUSD:-100000}}
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets:
+      - source: openai_api_key
+        target: openai_api_key
+        uid: "10001"
+        gid: "10001"
+        mode: 0400
+
+secrets:
+  openai_api_key:
+    environment: OPENAI_API_KEY

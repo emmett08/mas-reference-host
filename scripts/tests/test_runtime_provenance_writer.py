@@ -31,6 +31,8 @@ class ProvenanceWriterTests(unittest.TestCase):
             binary_dir.mkdir()
             manifest = root / 'Cargo.toml'
             manifest.write_text('[package]\nversion = "0.1.0"\n')
+            revision = root / 'protocol-revision.txt'
+            revision.write_text('b' * 40 + '\n')
             binaries = {name: {'sha256': hashlib.sha256(name.encode()).hexdigest()}
                         for name in ('mas', 'mas-gateway')}
             for name in binaries:
@@ -38,12 +40,16 @@ class ProvenanceWriterTests(unittest.TestCase):
                 (binary_dir / name).write_bytes(name.encode())
             subprocess.run([sys.executable, str(REPOSITORY / 'scripts' / 'write-runtime-provenance.py'),
                 '--host', str(host), '--rust-manifest', str(manifest),
-                '--binaries', str(binary_dir), '--source-commit', 'a' * 40, '--release-tag', 'v0.3.0'],
+                '--binaries', str(binary_dir), '--source-commit', 'a' * 40, '--release-tag', 'v0.3.0',
+                '--protocol-revision-file', str(revision)],
                 check=True)
             result = provenance.build_record(host / 'mas_host', binaries)
             self.assertEqual(result['status'], 'content_bound')
             self.assertEqual(result['release_tag'], 'v0.3.0')
             self.assertEqual(result['source_commit'], 'a' * 40)
+            self.assertEqual(result['format'], 'mas-runtime-build/2')
+            self.assertEqual(result['protocol_source'],
+                             {'repository': 'https://github.com/emmett08/mas', 'commit': 'b' * 40})
             self.assertTrue(all(result['binary_matches'].values()))
 
 

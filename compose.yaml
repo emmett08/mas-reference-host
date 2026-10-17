@@ -1,0 +1,36 @@
+services:
+  mesh:
+    image: mas-mesh:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    init: true
+    restart: "no"
+    cpus: "1.0"
+    mem_limit: 512m
+    memswap_limit: 512m
+    pids_limit: 64
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:mode=1777,size=16m
+    environment:
+      MAS_MODE: mock
+      MAS_STATE_DIR: /state
+      MAS_TOPOLOGY: /app/examples/host/mesh.json
+      MAS_PLANNER_MODEL: ${MAS_PLANNER_MODEL:-gpt-4.1-mini}
+      MAS_REVIEWER_MODEL: ${MAS_REVIEWER_MODEL:-gpt-4o-mini}
+    volumes:
+      - mesh-state:/state
+
+volumes:
+  mesh-state:

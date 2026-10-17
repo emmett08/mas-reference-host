@@ -1,0 +1,37 @@
+# Start the independent reconciler with:
+# docker compose -f compose.yaml -f compose.production.yaml up -d reconciler
+# Then run a job with the same overlays using `run --rm mesh`.
+services:
+  reconciler:
+    image: mas-mesh:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    init: true
+    restart: unless-stopped
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    cpus: "0.25"
+    mem_limit: 128m
+    memswap_limit: 128m
+    pids_limit: 32
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tmpfs:
+      - /tmp:mode=1777,size=16m
+    command: ["admin", "--state-dir", "/state", "watch", "--interval", "5"]
+    healthcheck:
+      test: ["CMD", "python", "-m", "mas_host", "admin", "--state-dir", "/state", "reconciler-health", "--max-age-seconds", "30"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    volumes:
+      - mesh-state:/state

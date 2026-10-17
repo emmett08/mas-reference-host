@@ -108,8 +108,18 @@ def build_record(package, binaries):
         return {'status': 'unavailable', 'source_commit': None, 'release_tag': None}
     try:
         record = _json(raw)
-        if (type(record) is not dict or set(record) != {'format', 'source_commit', 'release_tag',
-                'host_version', 'package_sha256', 'binaries'} or record['format'] != 'mas-runtime-build/1'
+        fields = {'format', 'source_commit', 'release_tag', 'host_version', 'package_sha256', 'binaries'}
+        if type(record) is dict and record.get('format') == 'mas-runtime-build/2':
+            fields |= {'source_repository', 'protocol_source'}
+            source = record.get('protocol_source')
+            if (record.get('source_repository') != 'https://github.com/emmett08/mas-reference-host'
+                    or type(source) is not dict or set(source) != {'repository', 'commit'}
+                    or source['repository'] != 'https://github.com/emmett08/mas'
+                    or type(source['commit']) is not str
+                    or re.fullmatch('[0-9a-f]{40}', source['commit']) is None):
+                raise ValueError('invalid split-source binding')
+        if (type(record) is not dict or set(record) != fields
+                or record['format'] not in {'mas-runtime-build/1', 'mas-runtime-build/2'}
                 or record['source_commit'] is not None and (
                     type(record['source_commit']) is not str or re.fullmatch('[0-9a-f]{40}', record['source_commit']) is None)
                 or record['release_tag'] is not None and (

@@ -1,0 +1,8 @@
+# Build and retain this image, then register its exact image ID or repository digest.
+FROM python:3.14-alpine@sha256:f6a589d43c42b9e7f7dc67a12d37132491f362859a5d750607710cc56da3bc72
+LABEL org.opencontainers.image.source="https://github.com/emmett08/mas-reference-host" \
+      org.openai.mas.container-protocol="1"
+COPY host/mas_host/container_entry.py /opt/mas/container_entry.py
+RUN chmod 0444 /opt/mas/container_entry.py
+WORKDIR /workspace
+ENTRYPOINT ["/usr/local/bin/python", "-I", "/opt/mas/container_entry.py"]

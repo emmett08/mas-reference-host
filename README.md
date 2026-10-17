@@ -3,7 +3,7 @@
 The Python reference implementation extracted from
 [`emmett08/mas`](https://github.com/emmett08/mas/tree/395c407111ea6c37eaa203f60d3cc162b7c9c56b/host)
 at commit `395c407111ea6c37eaa203f60d3cc162b7c9c56b`.
-The `host/` package, tests, dependency locks, selected host utilities, and
+The `host/` package, tests, dependency locks, host build and qualification utilities, containers, documentation, and
 `examples/{host,bridges,workflows}` fixtures retain their upstream layout.
 `formal/authority-traces.json` is an imported test corpus, not a protocol specification.
 GPL-3.0-only and the upstream third-party notices are retained.
@@ -42,10 +42,12 @@ mas-client --help
 
 The host delegates protocol operations to external `mas` and `mas-gateway`
 executables; no Rust protocol source is vendored here. Download the protocol
-source at the full SHA in `protocol-revision.txt` into an **untracked**
-`.protocol/` directory. With Rust 1.99.0, build its binaries:
+source at the full SHA in `protocol-revision.txt` with `make protocol`. This
+creates an **untracked** `.protocol/` checkout and `.protocol-revision` identity
+file and compares the shared conformance corpora. With Rust 1.99.0, build its binaries:
 
 ```sh
+make protocol
 cargo +1.99.0 build --locked --release \
   --manifest-path .protocol/rust-protocol/Cargo.toml \
   --target-dir "$PWD/rust-protocol/target" \
@@ -116,15 +118,41 @@ Report vulnerabilities privately through this repository's
 not a public issue containing exploit details or secrets. Dependency audits fail
 closed; do not add blanket advisory exclusions.
 
+## Containers, qualification and releases
+
+After `make protocol`, run the credential-free reference mesh with:
+
+```sh
+docker compose up --build --abort-on-container-exit --exit-code-from mesh
+```
+
+The standard and Cursor Dockerfiles build Rust from `.protocol/rust-protocol`.
+Python sources, locks, image package locks, Compose profiles and release tools
+are maintained here. Runtime build records use `mas-runtime-build/2` to bind
+this host repository and the separate protocol commit; the reader still accepts
+historical version-1 records. Release manifests likewise record both source
+identities. An override used by protocol compatibility CI is recorded separately
+from the default reviewed pin. No release is published automatically.
+
+The migrated workflows retain Linux amd64/arm64 container checks, installed
+Temporal/LangGraph and real Temporal-server checks, Windows/macOS/Linux portable
+clients, PostgreSQL/S3, trusted workspace containment, independent-VM faults and
+image vulnerability scans. [Verification](docs/verification.md) separates the
+historical evidence from checks on a submitted revision. The [host guide](docs/host-runner.md),
+[operations](docs/operations.md) and [release procedure](docs/releases.md) provide
+the corresponding commands.
+
 ## Coordinated migration
 
-Merge and verify this extraction before removing `host/` upstream. A separate PR
-in `emmett08/mas` must remove the migrated Python implementation, retarget its
-host/container/qualification workflows and documentation to a reviewed revision
-of this repository, and retain protocol-only checks and downstream compatibility.
-That PR must migrate any remaining container/release tooling and host documentation
-before deleting their inputs; containers are not claimed to be migrated here.
-The native host and application examples should keep their own reviewed protocol
-and host pins and passing workflows; this extraction must not rewrite those repos.
-Removing upstream code, opening that PR, and enabling repository rules require
-separate repository access and are not performed by this change.
+This repository owns the Python implementation, containers, release tooling,
+reference examples and host documentation. `mas` retains protocol sources,
+formal models, the shared trace corpus and immutable historical revisions.
+Its compatibility workflows select this repository by full commit SHA and test
+it against the protocol change under review. Required upstream check names are
+preserved and fail if their migrated prerequisites fail or do not run.
+
+The separate `mas-host`, `mas-host-examples` and `mas-demo` repositories keep their
+own source, configuration and reviewed pins. The protocol removal PR exercises
+their pinned revisions with the candidate Rust protocol without changing them.
+Merge this repository's migration PR first, then the corresponding removal PR
+only after its checks pass. Git history preserves all earlier pinned sources.

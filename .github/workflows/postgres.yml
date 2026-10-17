@@ -1,0 +1,116 @@
+name: PostgreSQL protocol repository
+on:
+  pull_request:
+    paths: ['protocol-revision.txt', '.github/actions/protocol/**', 'host/**', 'scripts/check-object-storage.py', 'scripts/run-unittest-shard.py', 'scripts/tests/test_unittest_shard.py', '.github/workflows/postgres.yml']
+  push:
+    branches: [main]
+    paths: ['protocol-revision.txt', '.github/actions/protocol/**', 'host/**', 'scripts/check-object-storage.py', 'scripts/run-unittest-shard.py', 'scripts/tests/test_unittest_shard.py', '.github/workflows/postgres.yml']
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      reference_host_ref:
+        type: string
+        required: false
+        default: ''
+      protocol_ref:
+        type: string
+        required: false
+        default: ''
+concurrency:
+  group: postgres-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+permissions:
+  contents: read
+jobs:
+  shared-tests:
+    name: Shared PostgreSQL tests (${{ matrix.shard }})
+    runs-on: ubuntu-24.04
+    # The 109-test serial Python suite took 1103 seconds on 2026-10-17.
+    # Each shard retains fresh PostgreSQL state and the original test deadlines.
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        shard: [0, 1, 2, 3]
+    services:
+      postgres:
+        image: postgres:16.15@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
+        env:
+          POSTGRES_PASSWORD: postgres-fixture-only
+          POSTGRES_DB: mas_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      MAS_TEST_POSTGRES_DSN: host=127.0.0.1 port=5432 user=postgres password=postgres-fixture-only dbname=mas_test
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: emmett08/mas-reference-host
+          ref: ${{ inputs.reference_host_ref || github.sha }}
+          persist-credentials: false
+      - uses: ./.github/actions/protocol
+        with:
+          revision: ${{ inputs.protocol_ref }}
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.99.0 --profile minimal
+      - name: Validate exact unittest partitioning
+        if: matrix.shard == 0
+        run: python -m unittest discover -s scripts/tests -p test_unittest_shard.py -v
+      - name: Existing native contracts with shared backend compiled
+        if: matrix.shard == 0
+        run: cargo test --locked --manifest-path .protocol/rust-protocol/Cargo.toml --target-dir "$GITHUB_WORKSPACE/rust-protocol/target" --features postgres-repository
+      - name: Real PostgreSQL conformance and fault boundaries
+        if: matrix.shard == 0
+        run: cargo test --locked --manifest-path .protocol/rust-protocol/Cargo.toml --target-dir "$GITHUB_WORKSPACE/rust-protocol/target" --features postgres-repository --test postgres_repository -- --ignored --nocapture
+      - name: Real PostgreSQL period accounting and legacy migration
+        if: matrix.shard == 0
+        run: cargo test --locked --manifest-path .protocol/rust-protocol/Cargo.toml --target-dir "$GITHUB_WORKSPACE/rust-protocol/target" --features postgres-repository --test shared_accounting -- --ignored --nocapture
+      - name: Install native PostgreSQL archive clients
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client-16 libpq5
+          echo /usr/lib/postgresql/16/bin >> "$GITHUB_PATH"
+      - name: Build the shared host command channel
+        run: cargo build --locked --manifest-path .protocol/rust-protocol/Cargo.toml --target-dir "$GITHUB_WORKSPACE/rust-protocol/target" --features postgres-repository --bin mas-shared --bin mas-gateway
+      - name: Run the Python runner against shared Rust and PostgreSQL authority
+        env:
+          PYTHONPATH: host
+          MAS_SHARED_BIN: ${{ github.workspace }}/rust-protocol/target/debug/mas-shared
+        run: python scripts/run-unittest-shard.py -s host/tests -p 'test_shared_*.py' --shard-index ${{ matrix.shard }} --shard-count 4
+      - name: Install hash-locked object-storage SDK
+        if: matrix.shard == 0
+        run: python -m pip install --require-hashes -r host/requirements-object-storage.txt
+      - name: Install verified RustFS fixture
+        if: matrix.shard == 0
+        run: |
+          curl --fail --location --proto '=https' --tlsv1.2 --max-time 180 --retry 2 \
+            https://github.com/rustfs/rustfs/releases/download/1.0.1/rustfs-linux-x86_64-gnu-v1.0.1.zip \
+            --output "$RUNNER_TEMP/rustfs.zip"
+          printf '%s  %s\n' 9742e183cb0dfb0d48fa909797af572fe47b7f827569036baa4156e0d3958ee5 "$RUNNER_TEMP/rustfs.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/rustfs.zip" -d "$RUNNER_TEMP/mas-rustfs"
+          chmod 700 "$RUNNER_TEMP/mas-rustfs/rustfs"
+      - name: Real PostgreSQL and S3 publication and fencing boundaries
+        if: matrix.shard == 0
+        env:
+          PYTHONPATH: host
+          MAS_SHARED_BIN: ${{ github.workspace }}/rust-protocol/target/debug/mas-shared
+        run: python scripts/check-object-storage.py --local-rustfs "$RUNNER_TEMP/mas-rustfs/rustfs" --shared-authority
+  conformance:
+    # Preserve the required check name and fail closed on skipped/cancelled shards.
+    if: ${{ always() }}
+    needs: shared-tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Require every PostgreSQL shard and qualification
+        env:
+          SHARED_TEST_RESULT: ${{ needs.shared-tests.result }}
+        run: test "$SHARED_TEST_RESULT" = success

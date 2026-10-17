@@ -1,0 +1,78 @@
+name: Independent machine worker qualification
+on:
+  pull_request:
+    paths: ['host/**', 'protocol-revision.txt', '.github/actions/protocol/**', 'scripts/check-multimachine.py', 'scripts/qualification/**', 'scripts/tests/test_machine_evidence.py', '.github/workflows/multimachine.yml']
+  push:
+    branches: [main]
+    paths: ['host/**', 'protocol-revision.txt', '.github/actions/protocol/**', 'scripts/check-multimachine.py', 'scripts/qualification/**', 'scripts/tests/test_machine_evidence.py', '.github/workflows/multimachine.yml']
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      reference_host_ref:
+        type: string
+        required: false
+        default: ''
+      protocol_ref:
+        type: string
+        required: false
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: multimachine-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  independent-kernels:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: emmett08/mas-reference-host
+          ref: ${{ inputs.reference_host_ref || github.sha }}
+          persist-credentials: false
+      - uses: ./.github/actions/protocol
+        with:
+          revision: ${{ inputs.protocol_ref }}
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.14'
+      - name: Verify durable evidence inspection
+        run: python -m unittest discover -s scripts/tests -p test_machine_evidence.py -v
+      - name: Install unprivileged VM prerequisites and pinned Rust
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 cloud-image-utils openssh-client
+          rustup toolchain install 1.99.0 --profile minimal
+          cargo build --locked --release --manifest-path .protocol/rust-protocol/Cargo.toml --target-dir "$GITHUB_WORKSPACE/rust-protocol/target" --bin mas --bin mas-gateway
+      - name: Download immutable Ubuntu guest image
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, pathlib, shutil, urllib.request
+          lock = json.loads(pathlib.Path('scripts/qualification/ubuntu-cloud-image.json').read_text())
+          path = pathlib.Path(os.environ['RUNNER_TEMP']) / 'mas-ubuntu.img'
+          with urllib.request.urlopen(lock['url'], timeout=30) as source, path.open('wb') as target:
+              shutil.copyfileobj(source, target, 1024 * 1024)
+          with path.open('rb') as stream:
+              assert hashlib.file_digest(stream, 'sha256').hexdigest() == lock['sha256']
+          PY
+      - name: Exercise real VM network, process, spool and artifact failures
+        run: python scripts/check-multimachine.py --image "$RUNNER_TEMP/mas-ubuntu.img" --state-dir "$PWD/machine-evidence"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: independent-machine-evidence
+          if-no-files-found: warn
+          path: |
+            machine-evidence/qualification.json
+            machine-evidence/worker-one/serial.log
+            machine-evidence/worker-two/serial.log
+            machine-evidence/worker-one/ssh-readiness.log
+            machine-evidence/worker-two/ssh-readiness.log
+            machine-evidence/worker-one/reboot-readiness.log
+            machine-evidence/worker-one/tunnel.log
+            machine-evidence/worker-two/tunnel.log
+            machine-evidence/*/controller.log
+            machine-evidence/*/observations.json
+            machine-evidence/*/case.json
+            machine-evidence/*/failure.json

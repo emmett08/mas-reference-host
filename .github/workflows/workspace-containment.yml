@@ -1,0 +1,57 @@
+name: Workspace containment qualification
+on:
+  pull_request:
+    paths: ['host/**', 'protocol-revision.txt', '.github/actions/protocol/**', 'Dockerfile.workspace', 'scripts/check-container-workspace.py', '.github/workflows/workspace-containment.yml']
+  push:
+    paths: ['host/**', 'protocol-revision.txt', '.github/actions/protocol/**', 'Dockerfile.workspace', 'scripts/check-container-workspace.py', '.github/workflows/workspace-containment.yml']
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      reference_host_ref:
+        type: string
+        required: false
+        default: ''
+      protocol_ref:
+        type: string
+        required: false
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: containment-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  real-linux-container:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: emmett08/mas-reference-host
+          ref: ${{ inputs.reference_host_ref || github.sha }}
+          persist-credentials: false
+      - uses: ./.github/actions/protocol
+        with:
+          revision: ${{ inputs.protocol_ref }}
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.14'
+      - name: Install pinned Rust and build protocol binaries
+        run: |
+          rustup toolchain install 1.99.0 --profile minimal
+          cargo build --locked --release --manifest-path .protocol/rust-protocol/Cargo.toml --target-dir "$GITHUB_WORKSPACE/rust-protocol/target" --bin mas --bin mas-gateway
+      - name: Build trusted supervisor from pinned image
+        run: docker build --file Dockerfile.workspace --tag mas-workspace:qualification .
+      - name: Qualify immutable image with real Docker and Rust admission
+        env:
+          PYTHONPATH: host
+        run: |
+          container_image_id=$(docker image inspect --format '{{.Id}}' mas-workspace:qualification)
+          python scripts/check-container-workspace.py --image "$container_image_id" --mas "$PWD/rust-protocol/target/release/mas" --gateway "$PWD/rust-protocol/target/release/mas-gateway" > workspace-containment.json
+          cat workspace-containment.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: workspace-containment-evidence
+          path: workspace-containment.json
+          if-no-files-found: ignore

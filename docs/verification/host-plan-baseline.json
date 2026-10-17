@@ -1,0 +1,73 @@
+{
+  "schema": "mas-local-baseline/1",
+  "source_commit": "ccc7bb85cede76398aee19b24b9281f2d2959046",
+  "environment": {
+    "python": "3.14.8",
+    "rust": "1.99.0",
+    "spin": "6.5.1",
+    "pinned_python_dependencies": "build,cursor,bridges,orchestrators installed with --require-hashes",
+    "docker_available": false
+  },
+  "host": {
+    "tests": 684,
+    "skipped": 3,
+    "seconds": 65.378,
+    "status": "PASS",
+    "skips": "Three real Temporal interoperability tests rerun and passed separately"
+  },
+  "orchestrator_interoperability": {
+    "tests": 22,
+    "seconds": 3.346,
+    "status": "PASS",
+    "real_temporal_server": true
+  },
+  "scripts": {
+    "tests": 43,
+    "seconds": 0.539,
+    "status": "PASS"
+  },
+  "rust": {
+    "tests": 52,
+    "status": "PASS"
+  },
+  "executable_examples": {
+    "status": "PASS"
+  },
+  "formal": {
+    "status": "PASS",
+    "cases": 101,
+    "spin_version": "6.5.1"
+  },
+  "acceptance": {
+    "schema": "mas-deployment-acceptance/1",
+    "started_at": "2026-10-14T20:32:56.957784+00:00",
+    "mode": "mock",
+    "run_count": 12,
+    "success_count": 12,
+    "error_count": 0,
+    "elapsed_ms": 932,
+    "latency_ms": {
+      "maximum": 224,
+      "minimum": 165,
+      "p50": 191,
+      "p95": 224
+    },
+    "paid_provider_calls": 0,
+    "workload": {
+      "agents_per_run": 3,
+      "concurrency": 3,
+      "maximum_runs": 12,
+      "mock_provider_calls_per_successful_run": 2,
+      "name": "invoice-mesh",
+      "soak_seconds": 0
+    },
+    "scope": "Measured bounded mock workload only. Fault tests and live-provider acceptance are separate evidence. No production capacity claim."
+  },
+  "limitations": [
+    "Local x86_64 verification; no container or arm64 validation.",
+    "No paid provider network calls.",
+    "Mock acceptance timing is one bounded sample, not a production capacity estimate.",
+    "SPIN6.5.1 differs from Ubuntu packaged6.5.2; pinned Rust and Python dependencies match repository requirements."
+  ],
+  "scope": "Baseline only: measurements and tests were executed against the source_commit, before host-plan changes. This receipt does not qualify subsequent changes."
+}

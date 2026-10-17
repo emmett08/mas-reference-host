@@ -1,0 +1,118 @@
+name: Dependency and image security
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      reference_host_ref:
+        type: string
+        required: false
+        default: ''
+      protocol_ref:
+        type: string
+        required: false
+        default: ''
+  schedule:
+    - cron: '17 6 * * 1'
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+permissions:
+  contents: read
+jobs:
+  dependency-profiles:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: emmett08/mas-reference-host
+          ref: ${{ inputs.reference_host_ref || github.sha }}
+          persist-credentials: false
+      - uses: ./.github/actions/protocol
+        with:
+          revision: ${{ inputs.protocol_ref }}
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.14'
+      - name: Install locked Python auditor
+        run: python -m pip install --require-hashes -r host/requirements-security.txt
+      - name: Audit runtime, build and scanner dependencies
+        run: python scripts/release-audit.py
+      - name: Install pinned Cargo auditor
+        run: |
+          rustup toolchain install 1.88.0 --profile minimal
+          cargo +1.88.0 install cargo-audit --version 0.22.2 --locked
+      - name: Audit Cargo lock
+        run: cargo audit --file .protocol/rust-protocol/Cargo.lock --json > cargo-audit.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: dependency-audits
+          path: '*audit.json'
+  image-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: emmett08/mas-reference-host
+          ref: ${{ inputs.reference_host_ref || github.sha }}
+          persist-credentials: false
+      - uses: ./.github/actions/protocol
+        with:
+          revision: ${{ inputs.protocol_ref }}
+      - name: Build pinned image
+        run: |
+          docker compose build
+          docker build -f Dockerfile.cursor -t mas-mesh-cursor:local .
+      - name: Scan image including unfixed high and critical advisories
+        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e
+        with:
+          version: v0.75.0
+          image-ref: mas-mesh:local
+          scanners: vuln
+          severity: HIGH,CRITICAL
+          ignore-unfixed: 'false'
+          exit-code: '1'
+          format: json
+          output: image-audit.json
+      - name: Produce complete image SBOM
+        if: always()
+        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e
+        with:
+          version: v0.75.0
+          image-ref: mas-mesh:local
+          format: cyclonedx
+          output: image-sbom.cdx.json
+      - name: Scan optional Cursor image including native bridge dependencies
+        if: always()
+        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e
+        with:
+          version: v0.75.0
+          image-ref: mas-mesh-cursor:local
+          scanners: vuln
+          severity: HIGH,CRITICAL
+          ignore-unfixed: 'false'
+          exit-code: '1'
+          format: json
+          output: cursor-image-audit.json
+      - name: Produce optional Cursor image SBOM
+        if: always()
+        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e
+        with:
+          version: v0.75.0
+          image-ref: mas-mesh-cursor:local
+          format: cyclonedx
+          output: cursor-image-sbom.cdx.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: image-audit
+          path: |
+            image-audit.json
+            image-sbom.cdx.json
+            cursor-image-audit.json
+            cursor-image-sbom.cdx.json
