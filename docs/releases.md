@@ -100,7 +100,7 @@ trigger the release workflow. Manual dispatch must select an existing version
 tag. Versions must use that exact numeric form, without a prerelease suffix or
 leading zeroes. Branch dispatch is rejected before the expensive checks begin.
 The workflow has read-only repository permissions and never creates, moves or
-deletes a tag. This preserves the repository's owner-only branch and tag rules.
+deletes a tag. It leaves repository branch and tag permissions unchanged.
 
 The first job verifies that the selected lightweight or annotated tag resolves
 to the event's exact source commit. Protocol/SPIN, host/Compose/acceptance and

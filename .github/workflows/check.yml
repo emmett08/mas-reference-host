@@ -108,3 +108,9 @@ jobs:
         run: |
           python -m pip install --require-hashes -r host/requirements-security.txt
           python scripts/release-audit.py
+      - name: Resolve every locked dependency profile
+        run: |
+          for lock in host/requirements-*.txt; do
+            python -m pip install --dry-run --ignore-installed --require-hashes \
+              -r host/requirements-build.txt -r "$lock"
+          done
