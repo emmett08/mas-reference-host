@@ -69,7 +69,7 @@ jobs:
           docker compose build
           docker build -f Dockerfile.cursor -t mas-mesh-cursor:local .
       - name: Scan image including unfixed high and critical advisories
-        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e
+        uses: aquasecurity/trivy-action@6abccf398f78b4c337599c0656f933d91efb91a0
         with:
           version: v0.75.0
           image-ref: mas-mesh:local
@@ -81,7 +81,7 @@ jobs:
           output: image-audit.json
       - name: Produce complete image SBOM
         if: always()
-        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e
+        uses: aquasecurity/trivy-action@6abccf398f78b4c337599c0656f933d91efb91a0
         with:
           version: v0.75.0
           image-ref: mas-mesh:local
@@ -89,7 +89,7 @@ jobs:
           output: image-sbom.cdx.json
       - name: Scan optional Cursor image including native bridge dependencies
         if: always()
-        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e
+        uses: aquasecurity/trivy-action@6abccf398f78b4c337599c0656f933d91efb91a0
         with:
           version: v0.75.0
           image-ref: mas-mesh-cursor:local
@@ -101,7 +101,7 @@ jobs:
           output: cursor-image-audit.json
       - name: Produce optional Cursor image SBOM
         if: always()
-        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e
+        uses: aquasecurity/trivy-action@6abccf398f78b4c337599c0656f933d91efb91a0
         with:
           version: v0.75.0
           image-ref: mas-mesh-cursor:local
