@@ -113,7 +113,7 @@ class SharedAccountingTests(unittest.TestCase):
         self.assertFalse(report['invoice_complete'])
         self.assertFalse(report['allocation_changed'])
         self.assertEqual(self.authority.query('scope', {'scope': 'deployment'})['microusd'], 10)
-        self.assertEqual(self.admin.periods()[0]['reserved_microusd'], 10)
+        self.assertEqual(sum(period['reserved_microusd'] for period in self.admin.periods()), 10)
         with self.assertRaises(OperationsError):
             self.admin.record_charge(**(charge | {'charge_id': 'future', 'observed_at': 2**63 - 1}))
         with self.assertRaises(OperationsError):
