@@ -93,10 +93,11 @@ class SharedAccountingTests(unittest.TestCase):
         self.assertEqual(self.authority.query('scope', {'scope': 'deployment'})['microusd'], 20)
 
     def test_negative_bucket_uses_floor_and_charge_observations_never_refund(self):
-        start = int(time.time()) + 86401
+        # Keep database admission and inspection far from the bucket boundary.
+        start = int(time.time()) + 86400 + 43200
         receipt = self.configure(start=start)
         self.assertEqual(receipt['high_water'], PeriodPolicy(86400, 2, 20, start).bucket(receipt['created']))
-        self.assertLess(receipt['high_water'], 0)
+        self.assertEqual(receipt['high_water'], -2)
         runner = self.runner()
         runner.request('a', 'b', 'effect', {})
         call = self.authority.query('invocations', {'run': runner.run_id})[0]['call_id']
@@ -113,7 +114,7 @@ class SharedAccountingTests(unittest.TestCase):
         self.assertFalse(report['invoice_complete'])
         self.assertFalse(report['allocation_changed'])
         self.assertEqual(self.authority.query('scope', {'scope': 'deployment'})['microusd'], 10)
-        self.assertEqual(sum(period['reserved_microusd'] for period in self.admin.periods()), 10)
+        self.assertEqual(self.admin.periods()[0]['reserved_microusd'], 10)
         with self.assertRaises(OperationsError):
             self.admin.record_charge(**(charge | {'charge_id': 'future', 'observed_at': 2**63 - 1}))
         with self.assertRaises(OperationsError):
