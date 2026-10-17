@@ -3,6 +3,7 @@ from pathlib import Path
 import tempfile
 import time
 import unittest
+from unittest import mock
 
 from mas_host.contracts import AdapterError, AdapterTimeout, Invocation, Outcome, RecoveryRequired, RunnerError
 from mas_host.execution_policy import RetryPolicy, TimingPolicy, clock_status, transition_clock
@@ -131,8 +132,18 @@ class RetryIntegrationTests(unittest.TestCase):
             marker = self.root / str(supervised)
             adapters = self.adapters(marker, lambda: not_sent("custom", "operation_busy"), succeed_at=2)
             with Runner(runner_tests.topology(), adapters, self.root, supervised=supervised,
-                        execution_deadline=time.monotonic() + 0.2, retry_policy=policy, **self.options) as runner:
-                with self.assertRaises(AdapterTimeout):
+                        retry_policy=policy, **self.options) as runner:
+                schedule_retry = runner._journal.schedule_retry
+
+                def interrupt_after_checkpoint(*args, **kwargs):
+                    # Stop at the durable boundary under either executor. A
+                    # 200 ms wall-clock deadline can expire during admission
+                    # on a loaded runner, before any retry has been recorded.
+                    schedule_retry(*args, **kwargs)
+                    raise AdapterTimeout("test interruption after retry checkpoint")
+
+                with mock.patch.object(runner._journal, "schedule_retry", side_effect=interrupt_after_checkpoint), \
+                        self.assertRaisesRegex(AdapterTimeout, "after retry checkpoint"):
                     runner.request("a", "b", "retry", {})
                 run_dir = runner.run_dir
                 before = inspect_run(run_dir)["invocations"][0]["retry_decision"]

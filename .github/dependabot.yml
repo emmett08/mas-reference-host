@@ -8,6 +8,13 @@ updates:
     directory: /host
     schedule:
       interval: weekly
+    ignore:
+      # langchain-core 1.6.10 requires uuid-utils >=0.12.0,<1.0.
+      # Remove this exclusion when the locked LangChain version accepts 1.x;
+      # refresh the orchestrator lock together and run its SDK qualification.
+      # Compatible 0.x updates remain enabled.
+      - dependency-name: uuid-utils
+        versions: [">=1.0.0"]
   - package-ecosystem: docker
     directory: /
     schedule:
