@@ -1,4 +1,7 @@
 # Byte-compiled / optimized / DLL files
+.protocol/
+rust-protocol/target/
+python-*-audit.json
 __pycache__/
 *.py[codz]
 *$py.class

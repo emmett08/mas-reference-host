@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools==84.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mas-host"
+version = "0.1.0"
+description = "Python reference host for the MAS Rust capability gateway"
+requires-python = ">=3.10"
+license = "GPL-3.0-only"
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/emmett08/mas-reference-host"
+Issues = "https://github.com/emmett08/mas-reference-host/issues"
+
+[project.optional-dependencies]
+openai = ["openai==3.29.0"]
+cursor = ["cursor-sdk==1.0.37"]
+temporal = ["temporalio==1.34.0"]
+langgraph = ["langgraph==1.2.15"]
+bridges = ["jsonschema==4.26.0"]
+workflows = ["jsonschema==4.26.0"]
+object-storage = ["boto3==1.43.114"]
+
+[project.scripts]
+mas-host = "mas_host.__main__:main"
+mas-client = "mas_host.client_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mas_host*"]
+
+[tool.setuptools.package-data]
+mas_host = ["runtime_build.json", "cursor_runtime.json", "cursor_bridge_patch.json", "cursor_transport_bootstrap.mjs"]

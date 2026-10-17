@@ -1,0 +1,20 @@
+{
+  "architectures": {
+    "aarch64": {
+      "archive_root": "node-v24.21.0-linux-arm64",
+      "archive_sha256": "6ad1325edbdb5649c379b75a237147a666c95d4f9ae8d340fef2d1575d289ad2",
+      "license_sha256": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace",
+      "node_sha256": "0f8949d1028f6d61506b2d5bc57e7e6fe893d7b1997509b7847294fc9c616584",
+      "url": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-arm64.tar.xz"
+    },
+    "x86_64": {
+      "archive_root": "node-v24.21.0-linux-x64",
+      "archive_sha256": "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6",
+      "license_sha256": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace",
+      "node_sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+      "url": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz"
+    }
+  },
+  "format": "mas-cursor-node/1",
+  "version": "24.21.0"
+}

@@ -1,0 +1,76 @@
+{
+  "format": "mas-topology/1",
+  "groups": {
+    "entry": {
+      "kind": "star",
+      "agents": [
+        "client",
+        "hub"
+      ],
+      "hub": "hub"
+    },
+    "review": {
+      "kind": "mesh",
+      "agents": [
+        "worker",
+        "checker"
+      ]
+    },
+    "record": {
+      "kind": "tree",
+      "agents": [
+        "root",
+        "leaf"
+      ],
+      "parents": {
+        "leaf": "root"
+      }
+    }
+  },
+  "links": [
+    [
+      "entry/hub",
+      "review/worker"
+    ],
+    [
+      "review/worker",
+      "entry/hub"
+    ],
+    [
+      "review/checker",
+      "record/root"
+    ],
+    [
+      "record/root",
+      "review/checker"
+    ]
+  ],
+  "requests": [
+    [
+      "entry/client",
+      "entry/hub"
+    ],
+    [
+      "entry/hub",
+      "review/worker"
+    ],
+    [
+      "review/worker",
+      "review/checker"
+    ],
+    [
+      "review/checker",
+      "record/root"
+    ],
+    [
+      "record/root",
+      "record/leaf"
+    ]
+  ],
+  "application": "agent-task/1",
+  "max_messages": 40,
+  "max_bytes": 1000000,
+  "max_calls": 1,
+  "wall_seconds": 60,
+  "mailbox_capacity": 20
+}

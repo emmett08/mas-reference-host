@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/your-organisation/your-repository",
+  "ref": "replace-with-reviewed-commit-sha",
+  "model": "replace-with-your-cursor-model-id",
+  "prompt": "Read the README and describe the documented entry points. Do not modify files, run project scripts, push commits or create a pull request. Return a short textual report.",
+  "reservation_microusd": 100000,
+  "mode": "plan",
+  "auto_create_pr": false
+}

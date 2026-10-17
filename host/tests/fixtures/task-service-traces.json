@@ -1,0 +1,1957 @@
+{
+  "version": 1,
+  "scope": "Local service transitions with a controllable executor standing in for separately tested host checkpoints; not full implementation refinement. Principals0/1 share a submission key; update keys0/1 are distinct.",
+  "traces": [
+    {
+      "name": "principal_scope",
+      "actions": [
+        {
+          "op": "submit",
+          "args": [
+            0,
+            1
+          ],
+          "expect": {
+            "state": [
+              "queued",
+              "absent"
+            ],
+            "events": [
+              1,
+              0
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ]
+          }
+        },
+        {
+          "op": "submit",
+          "args": [
+            1,
+            1
+          ],
+          "expect": {
+            "state": [
+              "queued",
+              "queued"
+            ],
+            "events": [
+              1,
+              1
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ]
+          }
+        },
+        {
+          "op": "submit",
+          "args": [
+            0,
+            1
+          ],
+          "expect": {
+            "state": [
+              "queued",
+              "queued"
+            ],
+            "events": [
+              1,
+              1
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ]
+          }
+        },
+        {
+          "op": "submit",
+          "args": [
+            0,
+            2
+          ],
+          "expect": {
+            "error": "request_conflict",
+            "events": [
+              1,
+              1
+            ],
+            "state": [
+              "queued",
+              "queued"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ]
+          }
+        },
+        {
+          "op": "inspect",
+          "args": [
+            1,
+            0
+          ],
+          "expect": {
+            "error": "task_not_found",
+            "state": [
+              "queued",
+              "queued"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "op": "cancel",
+          "args": [
+            1,
+            0
+          ],
+          "expect": {
+            "error": "task_not_found",
+            "state": [
+              "queued",
+              "queued"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "op": "update",
+          "args": [
+            1,
+            0,
+            0,
+            1
+          ],
+          "expect": {
+            "error": "task_not_found",
+            "state": [
+              "queued",
+              "queued"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "op": "cancel",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "state": [
+              "cancelled",
+              "queued"
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "events": [
+              2,
+              1
+            ],
+            "revision": [
+              0,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "late_cancel_input_required",
+      "actions": [
+        {
+          "op": "submit",
+          "args": [
+            0,
+            1
+          ],
+          "expect": {
+            "state": [
+              "queued",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "begin",
+          "args": [
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "answer",
+          "args": [
+            "input_required"
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "cancel",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "events": [
+              3,
+              0
+            ]
+          }
+        },
+        {
+          "op": "commit",
+          "args": [],
+          "expect": {
+            "state": [
+              "cancelled",
+              "absent"
+            ],
+            "events": [
+              4,
+              0
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ]
+          }
+        },
+        {
+          "op": "cancel",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "events": [
+              4,
+              0
+            ],
+            "state": [
+              "cancelled",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ]
+          }
+        },
+        {
+          "op": "update",
+          "args": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "expect": {
+            "error": "invalid_task_state",
+            "state": [
+              "cancelled",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "events": [
+              4,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "late_cancel_auth_required",
+      "actions": [
+        {
+          "op": "submit",
+          "args": [
+            0,
+            1
+          ],
+          "expect": {
+            "state": [
+              "queued",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "begin",
+          "args": [
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "answer",
+          "args": [
+            "auth_required"
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "cancel",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "events": [
+              3,
+              0
+            ]
+          }
+        },
+        {
+          "op": "commit",
+          "args": [],
+          "expect": {
+            "state": [
+              "cancelled",
+              "absent"
+            ],
+            "events": [
+              4,
+              0
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ]
+          }
+        },
+        {
+          "op": "cancel",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "events": [
+              4,
+              0
+            ],
+            "state": [
+              "cancelled",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ]
+          }
+        },
+        {
+          "op": "update",
+          "args": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "expect": {
+            "error": "invalid_task_state",
+            "state": [
+              "cancelled",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "events": [
+              4,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "revision_identity",
+      "actions": [
+        {
+          "op": "submit",
+          "args": [
+            0,
+            1
+          ],
+          "expect": {
+            "state": [
+              "queued",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "begin",
+          "args": [
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "answer",
+          "args": [
+            "input_required"
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "commit",
+          "args": [],
+          "expect": {
+            "state": [
+              "input_required",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              3,
+              0
+            ]
+          }
+        },
+        {
+          "op": "update",
+          "args": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "expect": {
+            "state": [
+              "queued",
+              "absent"
+            ],
+            "revision": [
+              1,
+              0
+            ],
+            "events": [
+              4,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ]
+          }
+        },
+        {
+          "op": "update",
+          "args": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "expect": {
+            "revision": [
+              1,
+              0
+            ],
+            "events": [
+              4,
+              0
+            ],
+            "state": [
+              "queued",
+              "absent"
+            ],
+            "cancelled": [
+              false,
+              false
+            ]
+          }
+        },
+        {
+          "op": "update",
+          "args": [
+            0,
+            0,
+            0,
+            2
+          ],
+          "expect": {
+            "error": "request_conflict",
+            "state": [
+              "queued",
+              "absent"
+            ],
+            "revision": [
+              1,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              4,
+              0
+            ]
+          }
+        },
+        {
+          "op": "update",
+          "args": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "expect": {
+            "error": "invalid_task_state",
+            "state": [
+              "queued",
+              "absent"
+            ],
+            "revision": [
+              1,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              4,
+              0
+            ]
+          }
+        },
+        {
+          "op": "begin",
+          "args": [
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              1,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              5,
+              0
+            ]
+          }
+        },
+        {
+          "op": "update",
+          "args": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "expect": {
+            "error": "invalid_task_state",
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              1,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              5,
+              0
+            ]
+          }
+        },
+        {
+          "op": "answer",
+          "args": [
+            "completed"
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              1,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              5,
+              0
+            ]
+          }
+        },
+        {
+          "op": "commit",
+          "args": [],
+          "expect": {
+            "state": [
+              "completed",
+              "absent"
+            ],
+            "events": [
+              6,
+              0
+            ],
+            "revision": [
+              1,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ]
+          }
+        },
+        {
+          "op": "update",
+          "args": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "expect": {
+            "state": [
+              "completed",
+              "absent"
+            ],
+            "revision": [
+              1,
+              0
+            ],
+            "events": [
+              6,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "unknown_after_restart",
+      "actions": [
+        {
+          "op": "submit",
+          "args": [
+            0,
+            1
+          ],
+          "expect": {
+            "state": [
+              "queued",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "begin",
+          "args": [
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "crash",
+          "args": [],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "events": [
+              2,
+              0
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ]
+          }
+        },
+        {
+          "op": "begin",
+          "args": [
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "commit",
+          "args": [],
+          "expect": {
+            "state": [
+              "unknown",
+              "absent"
+            ],
+            "events": [
+              3,
+              0
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ]
+          }
+        },
+        {
+          "op": "cancel",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "state": [
+              "unknown",
+              "absent"
+            ],
+            "events": [
+              4,
+              0
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ]
+          }
+        },
+        {
+          "op": "begin",
+          "args": [
+            0
+          ],
+          "expect": {
+            "idle": true,
+            "state": [
+              "unknown",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "events": [
+              4,
+              0
+            ]
+          }
+        },
+        {
+          "op": "update",
+          "args": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "expect": {
+            "error": "invalid_task_state",
+            "state": [
+              "unknown",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "events": [
+              4,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "checkpoint_after_restart",
+      "actions": [
+        {
+          "op": "submit",
+          "args": [
+            0,
+            1
+          ],
+          "expect": {
+            "state": [
+              "queued",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "begin",
+          "args": [
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "answer",
+          "args": [
+            "auth_required"
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "crash",
+          "args": [],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "cancel",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "events": [
+              3,
+              0
+            ]
+          }
+        },
+        {
+          "op": "begin",
+          "args": [
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "events": [
+              3,
+              0
+            ]
+          }
+        },
+        {
+          "op": "commit",
+          "args": [],
+          "expect": {
+            "state": [
+              "cancelled",
+              "absent"
+            ],
+            "events": [
+              4,
+              0
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "late_cancel_completed",
+      "actions": [
+        {
+          "op": "submit",
+          "args": [
+            0,
+            1
+          ],
+          "expect": {
+            "state": [
+              "queued",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "begin",
+          "args": [
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "answer",
+          "args": [
+            "completed"
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "cancel",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "events": [
+              3,
+              0
+            ]
+          }
+        },
+        {
+          "op": "commit",
+          "args": [],
+          "expect": {
+            "state": [
+              "completed",
+              "absent"
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "events": [
+              4,
+              0
+            ],
+            "revision": [
+              0,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "late_cancel_failed",
+      "actions": [
+        {
+          "op": "submit",
+          "args": [
+            0,
+            1
+          ],
+          "expect": {
+            "state": [
+              "queued",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "begin",
+          "args": [
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "answer",
+          "args": [
+            "failed"
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "cancel",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "events": [
+              3,
+              0
+            ]
+          }
+        },
+        {
+          "op": "commit",
+          "args": [],
+          "expect": {
+            "state": [
+              "failed",
+              "absent"
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "events": [
+              4,
+              0
+            ],
+            "revision": [
+              0,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "late_cancel_unknown",
+      "actions": [
+        {
+          "op": "submit",
+          "args": [
+            0,
+            1
+          ],
+          "expect": {
+            "state": [
+              "queued",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "begin",
+          "args": [
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "answer",
+          "args": [
+            "unknown"
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "cancel",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "events": [
+              3,
+              0
+            ]
+          }
+        },
+        {
+          "op": "commit",
+          "args": [],
+          "expect": {
+            "state": [
+              "unknown",
+              "absent"
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "events": [
+              4,
+              0
+            ],
+            "revision": [
+              0,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "paused_then_cancel",
+      "actions": [
+        {
+          "op": "submit",
+          "args": [
+            0,
+            1
+          ],
+          "expect": {
+            "state": [
+              "queued",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "begin",
+          "args": [
+            0
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "answer",
+          "args": [
+            "input_required"
+          ],
+          "expect": {
+            "state": [
+              "running",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              2,
+              0
+            ]
+          }
+        },
+        {
+          "op": "commit",
+          "args": [],
+          "expect": {
+            "state": [
+              "input_required",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              3,
+              0
+            ]
+          }
+        },
+        {
+          "op": "cancel",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "state": [
+              "cancelled",
+              "absent"
+            ],
+            "events": [
+              4,
+              0
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ]
+          }
+        },
+        {
+          "op": "begin",
+          "args": [
+            0
+          ],
+          "expect": {
+            "idle": true,
+            "state": [
+              "cancelled",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "events": [
+              4,
+              0
+            ]
+          }
+        },
+        {
+          "op": "update",
+          "args": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "expect": {
+            "error": "invalid_task_state",
+            "state": [
+              "cancelled",
+              "absent"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              true,
+              false
+            ],
+            "events": [
+              4,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "principal1_lifecycle",
+      "actions": [
+        {
+          "op": "submit",
+          "args": [
+            1,
+            1
+          ],
+          "expect": {
+            "state": [
+              "absent",
+              "queued"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              0,
+              1
+            ]
+          }
+        },
+        {
+          "op": "begin",
+          "args": [
+            1
+          ],
+          "expect": {
+            "state": [
+              "absent",
+              "running"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              0,
+              2
+            ]
+          }
+        },
+        {
+          "op": "answer",
+          "args": [
+            "auth_required"
+          ],
+          "expect": {
+            "state": [
+              "absent",
+              "running"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              false
+            ],
+            "events": [
+              0,
+              2
+            ]
+          }
+        },
+        {
+          "op": "cancel",
+          "args": [
+            1,
+            1
+          ],
+          "expect": {
+            "state": [
+              "absent",
+              "running"
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              true
+            ],
+            "events": [
+              0,
+              3
+            ]
+          }
+        },
+        {
+          "op": "commit",
+          "args": [],
+          "expect": {
+            "state": [
+              "absent",
+              "cancelled"
+            ],
+            "events": [
+              0,
+              4
+            ],
+            "revision": [
+              0,
+              0
+            ],
+            "cancelled": [
+              false,
+              true
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

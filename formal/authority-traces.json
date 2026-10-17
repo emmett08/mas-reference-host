@@ -1,0 +1,1621 @@
+{
+  "version": 1,
+  "scope": "Selected shared-authority command observations with two controllers, two workers and two one-unit calls; real PostgreSQL/native worker implementation correspondence, not unrestricted refinement.",
+  "traces": [
+    {
+      "name": "competing_claims",
+      "actions": [
+        {
+          "op": "admit",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "admitted",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "claim",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "claimed",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "claim",
+          "args": [
+            0,
+            1,
+            0
+          ],
+          "expect": {
+            "accepted": false,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "claimed",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          },
+          "reject_code": "no_assignment"
+        },
+        {
+          "op": "dispatch",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "dispatched",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "receipt",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "completed",
+              "absent"
+            ],
+            "authoritative": [
+              true,
+              false
+            ],
+            "stored_evidence": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "replay_dispatch",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": false,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "completed",
+              "absent"
+            ],
+            "authoritative": [
+              true,
+              false
+            ],
+            "stored_evidence": [
+              1,
+              0
+            ]
+          },
+          "reject_code": "dispatch_already_granted"
+        }
+      ]
+    },
+    {
+      "name": "independent_workers",
+      "actions": [
+        {
+          "op": "admit",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "admitted",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "admit",
+          "args": [
+            0,
+            1
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 2,
+            "states": [
+              "admitted",
+              "admitted"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "claim",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 2,
+            "states": [
+              "claimed",
+              "admitted"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "claim",
+          "args": [
+            0,
+            1,
+            1
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 2,
+            "states": [
+              "claimed",
+              "claimed"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "dispatch",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 2,
+            "states": [
+              "dispatched",
+              "claimed"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "dispatch",
+          "args": [
+            0,
+            1,
+            1
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 2,
+            "states": [
+              "dispatched",
+              "dispatched"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "receipt",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 2,
+            "states": [
+              "completed",
+              "dispatched"
+            ],
+            "authoritative": [
+              true,
+              false
+            ],
+            "stored_evidence": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "receipt",
+          "args": [
+            0,
+            1,
+            1
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 2,
+            "states": [
+              "completed",
+              "completed"
+            ],
+            "authoritative": [
+              true,
+              true
+            ],
+            "stored_evidence": [
+              1,
+              1
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "drain_preserves_admitted_effect",
+      "actions": [
+        {
+          "op": "admit",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "admitted",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "claim",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "claimed",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "drain",
+          "args": [
+            0,
+            true
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": true,
+            "charges": 1,
+            "states": [
+              "claimed",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "dispatch",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": false,
+            "epoch": 1,
+            "controller": 0,
+            "draining": true,
+            "charges": 1,
+            "states": [
+              "claimed",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          },
+          "reject_code": "admission_draining"
+        },
+        {
+          "op": "admit",
+          "args": [
+            0,
+            1
+          ],
+          "expect": {
+            "accepted": false,
+            "epoch": 1,
+            "controller": 0,
+            "draining": true,
+            "charges": 1,
+            "states": [
+              "claimed",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          },
+          "reject_code": "admission_draining"
+        },
+        {
+          "op": "drain",
+          "args": [
+            0,
+            false
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "claimed",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "dispatch",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "dispatched",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "drain",
+          "args": [
+            0,
+            true
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": true,
+            "charges": 1,
+            "states": [
+              "dispatched",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "receipt",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": true,
+            "charges": 1,
+            "states": [
+              "completed",
+              "absent"
+            ],
+            "authoritative": [
+              true,
+              false
+            ],
+            "stored_evidence": [
+              1,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "handover_preserves_worker_claim",
+      "actions": [
+        {
+          "op": "admit",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "admitted",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "claim",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "claimed",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "dispatch",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "dispatched",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "drain",
+          "args": [
+            0,
+            true
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": true,
+            "charges": 1,
+            "states": [
+              "dispatched",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "handover",
+          "args": [
+            1
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 2,
+            "controller": 1,
+            "draining": true,
+            "charges": 1,
+            "states": [
+              "dispatched",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "admit",
+          "args": [
+            0,
+            1
+          ],
+          "expect": {
+            "accepted": false,
+            "epoch": 2,
+            "controller": 1,
+            "draining": true,
+            "charges": 1,
+            "states": [
+              "dispatched",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          },
+          "reject_code": "stale_protocol_authority"
+        },
+        {
+          "op": "dispatch",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": false,
+            "epoch": 2,
+            "controller": 1,
+            "draining": true,
+            "charges": 1,
+            "states": [
+              "dispatched",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          },
+          "reject_code": "stale_protocol_authority"
+        },
+        {
+          "op": "receipt",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": false,
+            "epoch": 2,
+            "controller": 1,
+            "draining": true,
+            "charges": 1,
+            "states": [
+              "dispatched",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          },
+          "reject_code": "stale_protocol_authority"
+        },
+        {
+          "op": "receipt",
+          "args": [
+            1,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 2,
+            "controller": 1,
+            "draining": true,
+            "charges": 1,
+            "states": [
+              "completed",
+              "absent"
+            ],
+            "authoritative": [
+              true,
+              false
+            ],
+            "stored_evidence": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "drain",
+          "args": [
+            1,
+            false
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 2,
+            "controller": 1,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "completed",
+              "absent"
+            ],
+            "authoritative": [
+              true,
+              false
+            ],
+            "stored_evidence": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "admit",
+          "args": [
+            1,
+            1
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 2,
+            "controller": 1,
+            "draining": false,
+            "charges": 2,
+            "states": [
+              "completed",
+              "admitted"
+            ],
+            "authoritative": [
+              true,
+              false
+            ],
+            "stored_evidence": [
+              1,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "reboot_retains_late_evidence",
+      "actions": [
+        {
+          "op": "admit",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "admitted",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "claim",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "claimed",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "dispatch",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "dispatched",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "reboot",
+          "args": [
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "unknown",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "receipt",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "unknown",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "receipt",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "unknown",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "replay_dispatch",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": false,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "unknown",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              1,
+              0
+            ]
+          },
+          "reject_code": "dispatch_already_granted"
+        },
+        {
+          "op": "admit",
+          "args": [
+            0,
+            1
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 2,
+            "states": [
+              "unknown",
+              "admitted"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "claim",
+          "args": [
+            0,
+            0,
+            1
+          ],
+          "expect": {
+            "accepted": false,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 2,
+            "states": [
+              "unknown",
+              "admitted"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              1,
+              0
+            ]
+          },
+          "reject_code": "no_assignment"
+        }
+      ]
+    },
+    {
+      "name": "receipt_and_dispatch_replay",
+      "actions": [
+        {
+          "op": "admit",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "admitted",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "claim",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "claimed",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "dispatch",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "dispatched",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "replay_dispatch",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": false,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "dispatched",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          },
+          "reject_code": "dispatch_already_granted"
+        },
+        {
+          "op": "receipt",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "completed",
+              "absent"
+            ],
+            "authoritative": [
+              true,
+              false
+            ],
+            "stored_evidence": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "receipt",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "completed",
+              "absent"
+            ],
+            "authoritative": [
+              true,
+              false
+            ],
+            "stored_evidence": [
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "op": "replay_dispatch",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": false,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "completed",
+              "absent"
+            ],
+            "authoritative": [
+              true,
+              false
+            ],
+            "stored_evidence": [
+              1,
+              0
+            ]
+          },
+          "reject_code": "dispatch_already_granted"
+        }
+      ]
+    },
+    {
+      "name": "stale_authority_cannot_grant_new_dispatch",
+      "actions": [
+        {
+          "op": "admit",
+          "args": [
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "admitted",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "claim",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "claimed",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "drain",
+          "args": [
+            0,
+            true
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 1,
+            "controller": 0,
+            "draining": true,
+            "charges": 1,
+            "states": [
+              "claimed",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "handover",
+          "args": [
+            1
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 2,
+            "controller": 1,
+            "draining": true,
+            "charges": 1,
+            "states": [
+              "claimed",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "drain",
+          "args": [
+            1,
+            false
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 2,
+            "controller": 1,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "claimed",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "admit",
+          "args": [
+            0,
+            1
+          ],
+          "expect": {
+            "accepted": false,
+            "epoch": 2,
+            "controller": 1,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "claimed",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          },
+          "reject_code": "stale_protocol_authority"
+        },
+        {
+          "op": "dispatch",
+          "args": [
+            0,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": false,
+            "epoch": 2,
+            "controller": 1,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "claimed",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          },
+          "reject_code": "stale_protocol_authority"
+        },
+        {
+          "op": "dispatch",
+          "args": [
+            1,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 2,
+            "controller": 1,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "dispatched",
+              "absent"
+            ],
+            "authoritative": [
+              false,
+              false
+            ],
+            "stored_evidence": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "op": "receipt",
+          "args": [
+            1,
+            0,
+            0
+          ],
+          "expect": {
+            "accepted": true,
+            "epoch": 2,
+            "controller": 1,
+            "draining": false,
+            "charges": 1,
+            "states": [
+              "completed",
+              "absent"
+            ],
+            "authoritative": [
+              true,
+              false
+            ],
+            "stored_evidence": [
+              1,
+              0
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

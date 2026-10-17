@@ -1,0 +1,18 @@
+{
+  "language-agent": {
+    "provider": "mock",
+    "model": "greeting-fixture-v1",
+    "reservation_microusd": 0,
+    "instructions": "Return greeting if the input text, stripped and case-folded, is hello or hi; otherwise other.",
+    "operation": "greeting/1",
+    "role": "language-classifier"
+  },
+  "number-agent": {
+    "provider": "mock",
+    "model": "square-fixture-v1",
+    "reservation_microusd": 0,
+    "instructions": "Return the exact integer square of the input value.",
+    "operation": "square/1",
+    "role": "integer-calculator"
+  }
+}

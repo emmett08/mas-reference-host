@@ -1,0 +1,9 @@
+{
+  "source": "https://a2a-protocol.org/v1.0.1/spec/a2a.json",
+  "specification": "https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto",
+  "retrieved": "2026-10-14",
+  "sha256": "ba4b702b5edbdcbfe972c272484eb38e1fcd72af3c0b7eaa114b50e97455d8dd",
+  "licence": "Apache-2.0",
+  "licence_source": "https://raw.githubusercontent.com/a2aproject/A2A/v1.0.1/LICENSE",
+  "description": "Official non-normative generated JSON Schema bundle; wire assertions also follow normative proto and specification."
+}

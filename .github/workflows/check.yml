@@ -1,0 +1,103 @@
+name: Reference host checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 6 * * 1'
+permissions:
+  contents: read
+concurrency:
+  group: reference-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+defaults:
+  run:
+    shell: bash
+jobs:
+  reference-host:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: mas_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_DB: mas_test
+        ports:
+          - 127.0.0.1:5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mas_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      MAS_BIN: ${{ github.workspace }}/rust-protocol/target/release/mas
+      MAS_GATEWAY_BIN: ${{ github.workspace }}/rust-protocol/target/release/mas-gateway
+      MAS_CODEC_BIN: ${{ github.workspace }}/rust-protocol/target/release/mas-protocol-codec
+      MAS_SHARED_BIN: ${{ github.workspace }}/rust-protocol/target/release/mas-shared
+      MAS_TEST_POSTGRES_DSN: host=127.0.0.1 port=5432 dbname=mas_test user=mas_test
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Read protocol pin
+        id: protocol
+        run: |
+          revision="$(cat protocol-revision.txt)"
+          [[ "$revision" =~ ^[0-9a-f]{40}$ ]]
+          echo "revision=$revision" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: emmett08/mas
+          ref: ${{ steps.protocol.outputs.revision }}
+          path: .protocol
+          persist-credentials: false
+          sparse-checkout: rust-protocol
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.14'
+      - name: Build external protocol binaries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          rustup toolchain install 1.99.0 --profile minimal
+          cargo +1.99.0 build --locked --release \
+            --manifest-path .protocol/rust-protocol/Cargo.toml \
+            --target-dir "$GITHUB_WORKSPACE/rust-protocol/target" \
+            --features postgres-repository \
+            --bin mas --bin mas-gateway --bin mas-protocol-codec --bin mas-shared
+          test -x "$MAS_BIN" && test -x "$MAS_GATEWAY_BIN"
+          test -x "$MAS_CODEC_BIN" && test -x "$MAS_SHARED_BIN"
+      - name: Install locked reference host
+        run: |
+          python scripts/release-locks.py --check
+          python -m pip install --require-hashes -r host/requirements-build.txt \
+            -r host/requirements-cursor.txt -r host/requirements-bridges.txt \
+            -r host/requirements-object-storage.txt
+          python -m pip install --no-deps --no-build-isolation ./host
+          python -m pip check
+          python scripts/install-cursor-runtime.py
+      - name: Test reference host and extraction
+        run: |
+          python -m unittest discover -s host/tests -v
+          python -m unittest discover -s scripts/tests -v
+      - name: Build wheel and exercise offline CLI
+        run: |
+          python -m pip wheel --no-deps --no-build-isolation --wheel-dir "$RUNNER_TEMP/wheels" ./host
+          mas-host --help
+          mas-client --help
+          mas-host --topology examples/host/mesh.json --mode mock --state-dir "$RUNNER_TEMP/reference-demo"
+  dependency-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.14'
+      - name: Audit all locked dependency profiles
+        run: |
+          python -m pip install --require-hashes -r host/requirements-security.txt
+          python scripts/release-audit.py
