@@ -1,0 +1,53 @@
+{
+  "format": "mas-ipc-benchmark/2",
+  "qualification": false,
+  "binary_sha256": {
+    "mas": "f29af90b31c93697d68b7f017acb1ab4b113bb6164cf1c70fe235ae04b9fcbd0",
+    "mas-gateway": "0d50305b500ba7d067913f9d7113edde949de11c21ad9d40ab20e32e56be70fd"
+  },
+  "workload": "completed-run status; one two-actor echo exchange",
+  "limitations": [
+    "single bounded fixture; no provider throughput or production SLO claim",
+    "CPU includes setup/teardown; status latency does not"
+  ],
+  "results": [
+    {
+      "strategy": "ProtocolClient",
+      "samples": 100,
+      "status_process_launches": 100,
+      "median_ms": 3.3912195,
+      "p95_ms": 4.777157,
+      "total_ms": 352.703246,
+      "response_bytes": 1045,
+      "status_host_cpu_seconds": 0.074971,
+      "latency_scope": "status calls after the same completed two-actor exchange",
+      "lifecycle": {
+        "host_cpu_seconds": 0.106954,
+        "child_cpu_seconds": 0.32485699999999995,
+        "total_cpu_seconds": 0.43181099999999994,
+        "wall_ms": 424.134955,
+        "scope": "construction, one exchange, status queries, close and child reaping",
+        "children_reaped": true
+      }
+    },
+    {
+      "strategy": "PersistentProtocolClient",
+      "samples": 100,
+      "status_process_launches": 0,
+      "median_ms": 0.4340355,
+      "p95_ms": 0.769515,
+      "total_ms": 48.657555,
+      "response_bytes": 1045,
+      "status_host_cpu_seconds": 0.03146600000000002,
+      "latency_scope": "status calls after the same completed two-actor exchange",
+      "lifecycle": {
+        "host_cpu_seconds": 0.05223,
+        "child_cpu_seconds": 0.03009800000000004,
+        "total_cpu_seconds": 0.08232800000000004,
+        "wall_ms": 83.919973,
+        "scope": "construction, one exchange, status queries, close and child reaping",
+        "children_reaped": true
+      }
+    }
+  ]
+}

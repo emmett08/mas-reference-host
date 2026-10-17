@@ -1,0 +1,43 @@
+name: Prepare reviewed protocol source
+description: Check out an immutable external protocol revision and record its identity.
+inputs:
+  revision:
+    description: Optional full SHA for cross-repository compatibility checks.
+    required: false
+    default: ''
+outputs:
+  revision:
+    description: Exact protocol commit used by this job.
+    value: ${{ steps.pin.outputs.revision }}
+runs:
+  using: composite
+  steps:
+    - name: Read protocol revision
+      id: pin
+      shell: bash
+      env:
+        REQUESTED_PROTOCOL_REVISION: ${{ inputs.revision }}
+      run: |
+        revision="${REQUESTED_PROTOCOL_REVISION:-$(cat protocol-revision.txt)}"
+        [[ "$revision" =~ ^[0-9a-f]{40}$ ]]
+        echo "revision=$revision" >> "$GITHUB_OUTPUT"
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        repository: emmett08/mas
+        ref: ${{ steps.pin.outputs.revision }}
+        path: .protocol
+        persist-credentials: false
+        sparse-checkout: |
+          rust-protocol
+          formal
+          examples
+          host/tests/fixtures
+    - name: Bind the external checkout
+      shell: bash
+      env:
+        EXPECTED_PROTOCOL_REVISION: ${{ steps.pin.outputs.revision }}
+      run: |
+        test "$(git -C .protocol rev-parse HEAD)" = "$EXPECTED_PROTOCOL_REVISION"
+        git -C .protocol diff --exit-code HEAD --
+        printf '%s\n' "$EXPECTED_PROTOCOL_REVISION" > .protocol-revision
+        python3 scripts/check-protocol-fixtures.py

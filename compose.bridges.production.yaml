@@ -1,0 +1,47 @@
+# Apply after compose.bridges.yaml (and after compose.bridges.mixed.yaml for live).
+# This reconciler watches bridge-state, never the separate mesh-state volume.
+services:
+  bridge:
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, python, -m, mas_host, bridge, health, --config, "${MAS_BRIDGE_CONFIG:-/app/examples/bridges/mesh.json}", --state-dir, /state]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+  worker:
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, python, -m, mas_host, bridge, worker-health, --state-dir, /state, --max-age-seconds, "30"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+  bridge-reconciler:
+    image: mas-mesh:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    init: true
+    restart: unless-stopped
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: "0.25"
+    mem_limit: 128m
+    memswap_limit: 128m
+    pids_limit: 32
+    stop_grace_period: 15s
+    tmpfs: ["/tmp:mode=1777,size=16m"]
+    volumes: [bridge-state:/state]
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+    command: [admin, --state-dir, /state, watch, --interval, "5"]
+    healthcheck:
+      test: [CMD, python, -m, mas_host, admin, --state-dir, /state, reconciler-health, --max-age-seconds, "30"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s

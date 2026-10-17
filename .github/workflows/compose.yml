@@ -1,0 +1,429 @@
+name: Host and Compose checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      reference_host_ref:
+        type: string
+        required: false
+        default: ''
+      protocol_ref:
+        type: string
+        required: false
+        default: ''
+concurrency:
+  group: compose-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  # Keep reference qualifications isolated from container builds and suites.
+  native-host:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            architecture: amd64
+          - runner: ubuntu-24.04-arm
+            architecture: arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: emmett08/mas-reference-host
+          ref: ${{ inputs.reference_host_ref || github.sha }}
+          persist-credentials: false
+      - uses: ./.github/actions/protocol
+        with:
+          revision: ${{ inputs.protocol_ref }}
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+      - name: Build Rust host binaries
+        run: |
+          rustup toolchain install 1.99.0 --profile minimal
+          cargo build --locked --release --manifest-path .protocol/rust-protocol/Cargo.toml --target-dir "$GITHUB_WORKSPACE/rust-protocol/target" --bin mas --bin mas-gateway --bin mas-protocol-codec
+      - name: Install host and test without API calls
+        env:
+          MAS_BIN: ${{ github.workspace }}/rust-protocol/target/release/mas
+          MAS_GATEWAY_BIN: ${{ github.workspace }}/rust-protocol/target/release/mas-gateway
+        run: |
+          python scripts/release-locks.py --check
+          python scripts/release-wolfi.py --lock docker/wolfi-packages.json --check
+          python -m pip install --require-hashes -r host/requirements-build.txt -r host/requirements-cursor.txt -r host/requirements-bridges.txt
+          python -m pip install --no-deps --no-build-isolation ./host
+          python -m pip check
+          python scripts/install-cursor-runtime.py
+          if [ "${{ matrix.architecture }}" = amd64 ]; then
+            PYTHONPATH="$GITHUB_WORKSPACE/host" python scripts/check-reference-load.py \
+              --expected-commit "$(git rev-parse HEAD)" \
+              --report "$RUNNER_TEMP/reference-load.json" \
+              > "$RUNNER_TEMP/reference-load.log" 2>&1
+            PYTHONPATH="$GITHUB_WORKSPACE/host" python scripts/check-reference-load.py \
+              --profile mixed --expected-commit "$(git rev-parse HEAD)" \
+              --report "$RUNNER_TEMP/reference-mixed.json" \
+              > "$RUNNER_TEMP/reference-mixed.log" 2>&1
+          fi
+          python -m unittest discover -s host/tests -v 2>&1 | tee native-host-tests.log
+          python -m unittest discover -s scripts/tests -v
+          python - <<'PY'
+          import importlib.util, json
+          spec = importlib.util.spec_from_file_location('check', 'scripts/release-container-check.py')
+          check = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(check)
+          print(json.dumps(check.cursor_bridge_smoke()))
+          PY
+      - name: Test installed orchestrator SDKs and real Temporal server
+        env:
+          MAS_BIN: ${{ github.workspace }}/rust-protocol/target/release/mas
+          MAS_GATEWAY_BIN: ${{ github.workspace }}/rust-protocol/target/release/mas-gateway
+          MAS_TEMPORAL_INTEROP: '1'
+        run: |
+          python -m venv /tmp/mas-orchestrators
+          /tmp/mas-orchestrators/bin/python -m pip install --require-hashes -r host/requirements-build.txt -r host/requirements-orchestrators.txt
+          /tmp/mas-orchestrators/bin/python -m pip install --no-deps --no-build-isolation ./host
+          /tmp/mas-orchestrators/bin/python -m pip check
+          /tmp/mas-orchestrators/bin/python -m unittest discover -s host/tests -p 'test_orchestrator*.py' -v 2>&1 | tee orchestrator-tests.log
+          /tmp/mas-orchestrators/bin/python -m unittest discover -s host/tests -p 'test_mcp*.py' -v
+          /tmp/mas-orchestrators/bin/python -m unittest discover -s host/tests -p 'test_a2a*.py' -v
+      - name: Check arm64 locked wheels
+        if: matrix.architecture == 'amd64'
+        run: |
+          python -m pip download --require-hashes --only-binary=:all: --platform manylinux2014_aarch64 --python-version 3.14 --implementation cp --abi cp314 --dest /tmp/arm64-wheels -r host/requirements-openai.txt
+          python -m pip download --require-hashes --only-binary=:all: --platform musllinux_1_2_aarch64 --platform musllinux_1_1_aarch64 --python-version 3.14 --implementation cp --abi cp314 --dest /tmp/musl-arm64-wheels -r host/requirements-openai.txt
+          python -m pip download --require-hashes --only-binary=:all: --platform manylinux2014_aarch64 --python-version 3.14 --implementation cp --abi cp314 --dest /tmp/cursor-arm64-wheels -r host/requirements-cursor.txt
+      - name: Bounded deployment acceptance
+        env:
+          MAS_BIN: ${{ github.workspace }}/rust-protocol/target/release/mas
+          MAS_GATEWAY_BIN: ${{ github.workspace }}/rust-protocol/target/release/mas-gateway
+        run: python -m mas_host.acceptance --runs 12 --concurrency 3 --report acceptance.json --state-dir /tmp/mas-acceptance
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: native-host-report-${{ matrix.architecture }}
+          path: |
+            acceptance.json
+            native-host-tests.log
+            orchestrator-tests.log
+            ${{ runner.temp }}/reference-load.json
+            ${{ runner.temp }}/reference-load.log
+            ${{ runner.temp }}/reference-mixed.json
+            ${{ runner.temp }}/reference-mixed.log
+  standard-container:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            architecture: amd64
+          - runner: ubuntu-24.04-arm
+            architecture: arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: emmett08/mas-reference-host
+          ref: ${{ inputs.reference_host_ref || github.sha }}
+          persist-credentials: false
+      - uses: ./.github/actions/protocol
+        with:
+          revision: ${{ inputs.protocol_ref }}
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+      - name: Install host CLI for Compose acceptance
+        run: |
+          python -m pip install --require-hashes -r host/requirements-build.txt -r host/requirements-bridges.txt
+          python -m pip install --no-deps --no-build-isolation ./host
+          python -m pip check
+      - name: Validate Compose configuration
+        run: |
+          docker version
+          docker compose version
+          docker compose config --quiet
+          docker compose -f compose.yaml -f compose.production.yaml config --quiet
+      - name: Build and run mock mesh in Docker
+        run: |
+          docker compose build --build-arg MAS_SOURCE_COMMIT="$(git rev-parse HEAD)"
+          docker compose up --no-build --abort-on-container-exit --exit-code-from mesh
+      - name: Test installed musl runtime and shared libraries
+        run: |
+          docker run --rm --init --network none --user 10001:10001 --read-only \
+            --cap-drop ALL --security-opt no-new-privileges --cpus 1 \
+            --memory 512m --memory-swap 512m --pids-limit 64 \
+            --tmpfs /tmp:mode=1777,size=256m \
+            --mount type=bind,src="$PWD/host/tests",dst=/mounted-tests,readonly \
+            --mount type=bind,src="$PWD/examples",dst=/mounted-examples,readonly \
+            --mount type=bind,src="$PWD/scripts/release-container-check.py",dst=/release-container-check.py,readonly \
+            --entrypoint python mas-mesh:local -I /release-container-check.py 2>&1 | tee installed-container-tests.log
+      - name: Check container report
+        run: |
+          docker compose logs --no-color --no-log-prefix mesh > compose-mesh.log
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('compose-mesh.log').read_text().strip().splitlines()[-1])
+          assert report['ok'] is True, report
+          assert report['mode'] == 'mock', report
+          PY
+          docker inspect "$(docker compose ps -a -q mesh)" > compose-container.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          config = json.loads(Path('compose-container.json').read_text())[0]['HostConfig']
+          assert config['Memory'] == 512 * 1024 * 1024, config
+          assert config['NanoCpus'] == 1_000_000_000, config
+          assert config['PidsLimit'] == 64, config
+          assert config['ReadonlyRootfs'] is True, config
+          PY
+      - name: Independent reconciliation watcher
+        run: |
+          docker compose -f compose.yaml -f compose.production.yaml up -d reconciler
+          reconciler_id=$(docker compose -f compose.yaml -f compose.production.yaml ps -q reconciler)
+          export reconciler_id
+          timeout 45 sh -c 'until [ "$(docker inspect --format "{{.State.Health.Status}}" "$reconciler_id")" = healthy ]; do sleep 1; done'
+          docker inspect --format '{{json .State.Health}}' "$reconciler_id" > reconciler-health.json
+      - name: Capture reconciler diagnostics
+        if: always()
+        run: |
+          reconciler_id=$(docker compose -f compose.yaml -f compose.production.yaml ps --all -q reconciler)
+          if [ -n "$reconciler_id" ]; then
+            docker inspect --format '{{json .State}}' "$reconciler_id" | tee reconciler-state.json
+            docker compose -f compose.yaml -f compose.production.yaml logs --no-color reconciler 2>&1 | tee reconciler.log
+          fi
+      - name: Check live secret injection without calling the API
+        env:
+          OPENAI_API_KEY: compose-mount-test-not-a-real-key
+        run: |
+          docker compose -f compose.yaml -f compose.openai.yaml config --quiet
+          docker compose -f compose.yaml -f compose.openai.yaml run --rm --no-deps --entrypoint python mesh -c '
+          import os, stat
+          from pathlib import Path
+          path = Path(os.environ["OPENAI_API_KEY_FILE"])
+          assert os.getuid() == 10001
+          assert "OPENAI_API_KEY" not in os.environ
+          assert path.stat().st_uid == 10001
+          assert stat.S_IMODE(path.stat().st_mode) == 0o400
+          assert path.read_text() == "compose-mount-test-not-a-real-key"
+          for directory in ("/app", "/usr/local/bin", "/usr/local/lib"):
+              assert not os.access(directory, os.W_OK), directory
+          print("Secret and application permissions verified; no API call made.")
+          '
+      - name: Check Cursor Cloud Jobs CLI without API calls
+        env:
+          CURSOR_API_KEY: compose-cursor-mount-test-not-a-real-key
+        run: |
+          docker compose -f compose.cursor-cloud.yaml config --quiet
+          docker compose -f compose.cursor-cloud.yaml run --rm --no-deps jobs --help
+      - name: Validate bridge deployment and private authentication mount
+        env:
+          MAS_PLANNER_MODEL: cursor-test-model
+          CURSOR_API_KEY: compose-cursor-mount-test-not-a-real-key
+          OPENAI_API_KEY: compose-openai-mount-test-not-a-real-key
+        run: |
+          python -m mas_host bridge init-auth --principal example-client \
+            --token-file /tmp/mas-bridge-test.token --verifier-file /tmp/mas-bridge-credentials.json
+          MAS_BRIDGE_CREDENTIALS="$(cat /tmp/mas-bridge-credentials.json)"
+          export MAS_BRIDGE_CREDENTIALS
+          for topology in mesh star tree; do
+            MAS_BRIDGE_CONFIG="/app/examples/bridges/$topology.json" docker compose -f compose.bridges.yaml config --quiet
+          done
+          docker compose -f compose.bridges.yaml -f compose.bridges.mixed.yaml config --quiet
+          docker compose -f compose.bridges.yaml config --format json > bridge-compose.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          config = json.loads(Path('bridge-compose.json').read_text())
+          for name in ('bridge', 'worker'):
+              assert config['services'][name]['tmpfs'] == ['/tmp:mode=1777,size=32m']
+          PY
+          docker compose -f compose.bridges.yaml run --rm --no-deps --entrypoint python bridge -c '
+          from mas_host.bridges.authentication import StaticTokenVerifier
+          from mas_host.bridge_config import load_config, build_service
+          from pathlib import Path
+          StaticTokenVerifier.from_file("/run/secrets/bridge_credentials")
+          for name in ("mesh", "star", "tree"):
+              config = load_config(Path("/app/examples/bridges/" + name + ".json"))
+              service = build_service(config, Path("/tmp/bridge-" + name))
+              assert "invoice_" + name in service.grants["example-client"]
+          print("Bridge configurations and private authentication mount verified.")
+          '
+      - name: Exercise supervised bridge deployment and restart recovery
+        run: |
+          export MAS_BRIDGE_CREDENTIALS="$(cat /tmp/mas-bridge-credentials.json)"
+          docker compose -f compose.bridges.yaml -f compose.bridges.production.yaml config --format json > bridge-production-compose.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          services = json.loads(Path('bridge-production-compose.json').read_text())['services']
+          for name in ('bridge', 'worker', 'bridge-reconciler'):
+              service = services[name]
+              assert service['restart'] == 'unless-stopped', (name, service)
+              assert service['healthcheck']['test'], name
+              assert any(v.get('source') == 'bridge-state' and v['target'] == '/state'
+                         for v in service['volumes']), name
+          PY
+          docker compose -f compose.bridges.yaml -f compose.bridges.production.yaml up -d --no-build --wait --wait-timeout 60
+          python - <<'PY'
+          import json, time
+          from pathlib import Path
+          from mas_host.bridges.service_client import TaskServiceClient
+          from mas_host.demo import DEFAULT_INVOICE
+          client = TaskServiceClient('http://127.0.0.1:8765', principal='example-client',
+              token_file=Path('/tmp/mas-bridge-test.token'), allow_loopback_http=True)
+          receipt = client.submit('example-client', 'compose-production-acceptance',
+                                  'invoice_mesh', {'invoice': DEFAULT_INVOICE})
+          deadline = time.monotonic() + 40
+          while receipt['state'] in ('queued', 'running') and time.monotonic() < deadline:
+              time.sleep(0.1)
+              receipt = client.inspect('example-client', receipt['task_id'])
+          assert receipt['state'] == 'completed', receipt
+          result = client.result('example-client', receipt['task_id'])
+          assert result['total_cents'] == 5497 and result['verified'] is True, result
+          Path('bridge-production-acceptance.json').write_text(json.dumps({
+              'task_id': receipt['task_id'], 'state': receipt['state'], 'result': result}))
+          PY
+          docker compose -f compose.bridges.yaml -f compose.bridges.production.yaml restart bridge worker
+          docker compose -f compose.bridges.yaml -f compose.bridges.production.yaml up -d --no-build --wait --wait-timeout 60
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from mas_host.bridges.service_client import TaskServiceClient
+          from mas_host.demo import DEFAULT_INVOICE
+          before = json.loads(Path('bridge-production-acceptance.json').read_text())
+          client = TaskServiceClient('http://127.0.0.1:8765', principal='example-client',
+              token_file=Path('/tmp/mas-bridge-test.token'), allow_loopback_http=True)
+          replay = client.submit('example-client', 'compose-production-acceptance',
+                                 'invoice_mesh', {'invoice': DEFAULT_INVOICE})
+          assert replay['task_id'] == before['task_id'] and replay['state'] == 'completed', replay
+          assert client.result('example-client', replay['task_id']) == before['result']
+          before['restart_replay_verified'] = True
+          Path('bridge-production-acceptance.json').write_text(json.dumps(before))
+          PY
+      - name: Capture bridge deployment status
+        if: always()
+        run: |
+          if [ -f /tmp/mas-bridge-credentials.json ]; then
+            export MAS_BRIDGE_CREDENTIALS="$(cat /tmp/mas-bridge-credentials.json)"
+            docker compose -f compose.bridges.yaml -f compose.bridges.production.yaml ps --all --format json > bridge-production-status.json
+            docker compose -f compose.bridges.yaml -f compose.bridges.production.yaml logs --no-color > bridge-production.log
+          fi
+      - name: Stop containers
+        if: always()
+        run: |
+          docker compose -f compose.yaml -f compose.production.yaml down
+          if [ -f /tmp/mas-bridge-credentials.json ]; then
+            export MAS_BRIDGE_CREDENTIALS="$(cat /tmp/mas-bridge-credentials.json)"
+            docker compose -f compose.bridges.yaml -f compose.bridges.production.yaml down
+          fi
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: compose-mock-report-${{ matrix.architecture }}
+          path: |
+            compose-mesh.log
+            compose-container.json
+            installed-container-tests.log
+            reconciler-health.json
+            reconciler-state.json
+            reconciler.log
+            bridge-production-acceptance.json
+            bridge-production-status.json
+            bridge-production.log
+  cursor-container:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            architecture: amd64
+          - runner: ubuntu-24.04-arm
+            architecture: arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: emmett08/mas-reference-host
+          ref: ${{ inputs.reference_host_ref || github.sha }}
+          persist-credentials: false
+      - uses: ./.github/actions/protocol
+        with:
+          revision: ${{ inputs.protocol_ref }}
+      - name: Build optional Cursor runtime and test without network or API calls
+        run: |
+          docker build --build-arg MAS_SOURCE_COMMIT="$(git rev-parse HEAD)" -f Dockerfile.cursor -t mas-mesh-cursor:local .
+          docker run --rm --init --network none --user 10001:10001 --read-only \
+            --cap-drop ALL --security-opt no-new-privileges --cpus 2 \
+            --memory 1g --memory-swap 1g --pids-limit 128 \
+            --tmpfs /tmp:mode=1777,size=256m \
+            --mount type=bind,src="$PWD/host/tests",dst=/mounted-tests,readonly \
+            --mount type=bind,src="$PWD/examples",dst=/mounted-examples,readonly \
+            --mount type=bind,src="$PWD/scripts/release-container-check.py",dst=/release-container-check.py,readonly \
+            --entrypoint python mas-mesh-cursor:local -I /release-container-check.py --cursor 2>&1 | tee installed-cursor-tests.log
+      - name: Check Cursor and mixed provider secret injection without API calls
+        env:
+          OPENAI_API_KEY: compose-openai-mount-test-not-a-real-key
+          CURSOR_API_KEY: compose-cursor-mount-test-not-a-real-key
+          MAS_PLANNER_MODEL: cursor-test-model
+          MAS_REVIEWER_MODEL: cursor-test-model
+        run: |
+          docker compose -f compose.yaml -f compose.cursor.yaml config --quiet
+          docker compose -f compose.yaml -f compose.mixed.yaml config --quiet
+          docker compose -f compose.yaml -f compose.mixed.yaml run --rm --no-deps --entrypoint python mesh -c '
+          import os, stat
+          from pathlib import Path
+          assert os.getuid() == 10001
+          for provider in ("OPENAI", "CURSOR"):
+              assert provider + "_API_KEY" not in os.environ
+              path = Path(os.environ[provider + "_API_KEY_FILE"])
+              assert path.stat().st_uid == 10001
+              assert stat.S_IMODE(path.stat().st_mode) == 0o400
+              assert path.read_text() == "compose-" + provider.lower() + "-mount-test-not-a-real-key"
+          for directory in ("/app", "/usr/local/bin", "/usr/local/lib"):
+              assert not os.access(directory, os.W_OK), directory
+          print("Both provider secrets mounted privately; no API call made.")
+          '
+      - name: Stop Cursor containers
+        if: always()
+        run: docker compose down
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: cursor-container-report-${{ matrix.architecture }}
+          path: |
+            installed-cursor-tests.log
+  # Preserve the existing matrix check names for branch protection and callers.
+  # A skipped or cancelled prerequisite must never produce a passing gate.
+  host-and-compose:
+    needs: [native-host, standard-container, cursor-container]
+    if: ${{ always() }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            architecture: amd64
+          - runner: ubuntu-24.04-arm
+            architecture: arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 5
+    steps:
+      - name: Require every architecture and runtime check
+        env:
+          NATIVE_RESULT: ${{ needs.native-host.result }}
+          STANDARD_RESULT: ${{ needs.standard-container.result }}
+          CURSOR_RESULT: ${{ needs.cursor-container.result }}
+        run: |
+          test "$NATIVE_RESULT" = success
+          test "$STANDARD_RESULT" = success
+          test "$CURSOR_RESULT" = success

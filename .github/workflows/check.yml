@@ -4,6 +4,16 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      reference_host_ref:
+        type: string
+        required: false
+        default: ''
+      protocol_ref:
+        type: string
+        required: false
+        default: ''
   schedule:
     - cron: '17 6 * * 1'
 permissions:
@@ -20,7 +30,7 @@ jobs:
     timeout-minutes: 30
     services:
       postgres:
-        image: postgres:16
+        image: postgres:16.15@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
         env:
           POSTGRES_USER: mas_test
           POSTGRES_HOST_AUTH_METHOD: trust
@@ -39,20 +49,12 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          repository: emmett08/mas-reference-host
+          ref: ${{ inputs.reference_host_ref || github.sha }}
           persist-credentials: false
-      - name: Read protocol pin
-        id: protocol
-        run: |
-          revision="$(cat protocol-revision.txt)"
-          [[ "$revision" =~ ^[0-9a-f]{40}$ ]]
-          echo "revision=$revision" >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/protocol
         with:
-          repository: emmett08/mas
-          ref: ${{ steps.protocol.outputs.revision }}
-          path: .protocol
-          persist-credentials: false
-          sparse-checkout: rust-protocol
+          revision: ${{ inputs.protocol_ref }}
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.14'
@@ -93,7 +95,12 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          repository: emmett08/mas-reference-host
+          ref: ${{ inputs.reference_host_ref || github.sha }}
           persist-credentials: false
+      - uses: ./.github/actions/protocol
+        with:
+          revision: ${{ inputs.protocol_ref }}
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.14'

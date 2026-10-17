@@ -221,3 +221,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+.protocol-revision
+*.sqlite
+*.sqlite-*
+.mas-state/
+.mas-private/
+secrets/
+/machine-evidence/
+/formal/evidence/

@@ -54,6 +54,22 @@ class ProvenanceTests(unittest.TestCase):
         self.assertIsNone(result['source_commit'])
         self.assertNotIn('binaries', result)
 
+    def test_split_repository_builds_bind_both_sources_and_reject_malformed_identity(self):
+        record = {**self.record, 'format': 'mas-runtime-build/2',
+                  'source_repository': 'https://github.com/emmett08/mas-reference-host',
+                  'protocol_source': {'repository': 'https://github.com/emmett08/mas', 'commit': 'b' * 40}}
+        self.write(record)
+        result = build_record(self.package, self.binaries)
+        self.assertEqual(result['status'], 'content_bound')
+        self.assertEqual(result['source_commit'], 'a' * 40)
+        self.assertEqual(result['protocol_source']['commit'], 'b' * 40)
+        for source in ({'repository': 'https://github.com/emmett08/mas', 'commit': 'main'},
+                       {'repository': 'https://example.invalid/other', 'commit': 'b' * 40},
+                       {'repository': 'https://github.com/emmett08/mas', 'commit': 'b' * 40, 'extra': 1}):
+            with self.subTest(source=source):
+                self.write({**record, 'protocol_source': source})
+                self.assertEqual(build_record(self.package, self.binaries)['status'], 'unavailable')
+
     def test_missing_safe_open_flags_report_unavailable_without_opening(self):
         self.write()
         for flag in ('O_NOFOLLOW', 'O_NONBLOCK'):

@@ -1,0 +1,41 @@
+x-bridge: &bridge
+  image: mas-mesh:local
+  build:
+    context: .
+    dockerfile: Dockerfile
+  init: true
+  user: "10001:10001"
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  cpus: "1.0"
+  mem_limit: 512m
+  memswap_limit: 512m
+  pids_limit: 64
+  stop_grace_period: 20s
+  tmpfs: ["/tmp:mode=1777,size=32m"]
+  volumes: [bridge-state:/state]
+  logging:
+    driver: json-file
+    options: {max-size: "10m", max-file: "3"}
+services:
+  bridge:
+    <<: *bridge
+    # Compose installs its environment-backed secret before dropping privileges.
+    read_only: false
+    command: [bridge, serve, --bind, "0.0.0.0", --port, "8765", --allow-loopback-http, --config, "${MAS_BRIDGE_CONFIG:-/app/examples/bridges/mesh.json}", --state-dir, /state]
+    ports: ["127.0.0.1:8765:8765"]
+    secrets:
+      - source: bridge_credentials
+        target: bridge_credentials
+        uid: "10001"
+        gid: "10001"
+        mode: 0400
+  worker:
+    <<: *bridge
+    command: [bridge, worker, --config, "${MAS_BRIDGE_CONFIG:-/app/examples/bridges/mesh.json}", --state-dir, /state]
+volumes:
+  bridge-state:
+secrets:
+  bridge_credentials:
+    environment: MAS_BRIDGE_CREDENTIALS

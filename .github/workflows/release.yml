@@ -1,0 +1,188 @@
+name: Release candidate artefacts
+on:
+  push:
+    tags: ['v0.*']
+  workflow_dispatch:
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  protocol:
+    needs: candidate
+    uses: ./.github/workflows/protocol.yml
+  host:
+    needs: candidate
+    uses: ./.github/workflows/compose.yml
+  security:
+    needs: candidate
+    uses: ./.github/workflows/security.yml
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.candidate.outputs.version }}
+      source: ${{ steps.candidate.outputs.source }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: ./.github/actions/protocol
+      - name: Test candidate source and image archive binding
+        run: python -m unittest discover -s scripts/tests -p 'test_release_*.py' -v
+      - name: Verify the existing owner-created candidate tag
+        id: candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_REF: ${{ github.ref }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: python scripts/release-candidate.py
+  package:
+    needs: [candidate, protocol, host, security]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            platform: linux/amd64
+            architecture: amd64
+            variant: standard
+            dockerfile: Dockerfile
+            image: mas-mesh
+            memory: 512m
+            cpus: '1'
+            pids: 64
+          - runner: ubuntu-24.04-arm
+            platform: linux/arm64
+            architecture: arm64
+            variant: standard
+            dockerfile: Dockerfile
+            image: mas-mesh
+            memory: 512m
+            cpus: '1'
+            pids: 64
+          - runner: ubuntu-24.04
+            platform: linux/amd64
+            architecture: amd64
+            variant: cursor
+            dockerfile: Dockerfile.cursor
+            image: mas-mesh-cursor
+            memory: 1g
+            cpus: '2'
+            pids: 128
+          - runner: ubuntu-24.04-arm
+            platform: linux/arm64
+            architecture: arm64
+            variant: cursor
+            dockerfile: Dockerfile.cursor
+            image: mas-mesh-cursor
+            memory: 1g
+            cpus: '2'
+            pids: 128
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      RELEASE_TAG: ${{ needs.candidate.outputs.version }}
+      RELEASE_ARCH: ${{ matrix.architecture }}
+      RELEASE_VARIANT: ${{ matrix.variant }}
+      RELEASE_IMAGE: ${{ matrix.image }}
+      RELEASE_MEMORY: ${{ matrix.memory }}
+      RELEASE_CPUS: ${{ matrix.cpus }}
+      RELEASE_PIDS: ${{ matrix.pids }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.candidate.outputs.source }}
+          persist-credentials: false
+      - uses: ./.github/actions/protocol
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        with:
+          version: v0.38.0
+          driver-opts: image=moby/buildkit:v0.34.0
+      - name: Build OCI archive with build provenance
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          platforms: ${{ matrix.platform }}
+          push: false
+          tags: ${{ matrix.image }}:${{ needs.candidate.outputs.version }}
+          provenance: mode=max
+          build-args: |
+            MAS_SOURCE_COMMIT=${{ needs.candidate.outputs.source }}
+            MAS_RELEASE_TAG=${{ needs.candidate.outputs.version }}
+          outputs: type=oci,dest=mas-${{ matrix.variant }}-${{ matrix.architecture }}.oci.tar,compression=gzip,force-compression=true
+      - name: Import and verify the exact OCI runtime image
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y skopeo
+          skopeo --version > release-import-tool.txt
+          python scripts/release-oci.py "mas-$RELEASE_VARIANT-$RELEASE_ARCH.oci.tar" --architecture "$RELEASE_ARCH" --binding release-image-binding.json
+          skopeo --override-os linux --override-arch "$RELEASE_ARCH" copy "oci-archive:mas-$RELEASE_VARIANT-$RELEASE_ARCH.oci.tar" "docker-daemon:$RELEASE_IMAGE:$RELEASE_TAG"
+          docker image inspect "$RELEASE_IMAGE:$RELEASE_TAG" > release-image-identity.json
+          python scripts/release-oci.py "mas-$RELEASE_VARIANT-$RELEASE_ARCH.oci.tar" --architecture "$RELEASE_ARCH" --binding release-image-binding.json --docker-inspect release-image-identity.json
+      - name: Run the native architecture image
+        run: docker run --rm --init --network none --user 10001:10001 --read-only --cap-drop ALL --security-opt no-new-privileges --memory "$RELEASE_MEMORY" --memory-swap "$RELEASE_MEMORY" --cpus "$RELEASE_CPUS" --pids-limit "$RELEASE_PIDS" --tmpfs /state:uid=10001,gid=10001,mode=0700 --tmpfs /tmp:mode=1777,size=256m "$RELEASE_IMAGE:$RELEASE_TAG"
+      - name: Verify the final image runtime and complete host fault suite
+        run: |
+          runtime_args=()
+          if [ "$RELEASE_VARIANT" = cursor ]; then runtime_args+=(--cursor); fi
+          docker run --rm --init --network none --user 10001:10001 --read-only \
+            --cap-drop ALL --security-opt no-new-privileges --cpus "$RELEASE_CPUS" \
+            --memory "$RELEASE_MEMORY" --memory-swap "$RELEASE_MEMORY" --pids-limit "$RELEASE_PIDS" \
+            --tmpfs /tmp:mode=1777,size=256m \
+            --mount type=bind,src="$PWD/host/tests",dst=/mounted-tests,readonly \
+            --mount type=bind,src="$PWD/examples",dst=/mounted-examples,readonly \
+            --mount type=bind,src="$PWD/scripts/release-container-check.py",dst=/release-container-check.py,readonly \
+            --entrypoint python "$RELEASE_IMAGE:$RELEASE_TAG" -I /release-container-check.py "${runtime_args[@]}" 2>&1 | tee release-container-tests.log
+      - name: Materialise the verified OCI layout for scanning
+        id: scanner
+        run: |
+          python scripts/release-oci.py "mas-$RELEASE_VARIANT-$RELEASE_ARCH.oci.tar" --architecture "$RELEASE_ARCH" --binding release-image-binding.json --layout-directory release-oci-layout
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          binding = json.loads(Path("release-image-binding.json").read_text())
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write("input=" + binding["scanner_input"] + "\n")
+          PY
+      - name: Scan the release runtime manifest
+        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e
+        with:
+          version: v0.75.0
+          input: ${{ steps.scanner.outputs.input }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: 'false'
+          exit-code: '1'
+          scanners: vuln
+          format: json
+          output: release-audit.json
+      - name: Generate release SBOM
+        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e
+        with:
+          version: v0.75.0
+          input: ${{ steps.scanner.outputs.input }}
+          format: cyclonedx
+          output: release-sbom.cdx.json
+      - name: Record source and artefact identity
+        env:
+          SOURCE_SHA: ${{ needs.candidate.outputs.source }}
+          RELEASE_TAG: ${{ needs.candidate.outputs.version }}
+          RELEASE_PLATFORM: ${{ matrix.platform }}
+        run: python scripts/release-manifest.py
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: mas-${{ needs.candidate.outputs.version }}-${{ matrix.variant }}-${{ matrix.architecture }}
+          retention-days: 30
+          path: |
+            mas-*.oci.tar
+            release-audit.json
+            release-sbom.cdx.json
+            release-manifest.json
+            release-image-identity.json
+            release-image-binding.json
+            release-import-tool.txt
+            release-container-tests.log
+            SHA256SUMS

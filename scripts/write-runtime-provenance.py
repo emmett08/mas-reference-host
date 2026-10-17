@@ -16,11 +16,15 @@ def main():
     parser.add_argument('--binaries', type=Path, required=True)
     parser.add_argument('--source-commit', default='')
     parser.add_argument('--release-tag', default='')
+    parser.add_argument('--protocol-revision-file', type=Path, required=True)
     args = parser.parse_args()
     if args.source_commit and re.fullmatch('[0-9a-f]{40}', args.source_commit) is None:
         parser.error('source commit must be a full SHA')
     if args.release_tag and (not args.source_commit or re.fullmatch(r'v0\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)', args.release_tag) is None):
         parser.error('release tag requires a source commit and v0.MINOR.PATCH')
+    protocol_revision = args.protocol_revision_file.read_text().strip()
+    if re.fullmatch('[0-9a-f]{40}', protocol_revision) is None:
+        parser.error('protocol revision must be a full SHA')
     package = args.host / 'mas_host'
     # This explicitly selected build helper is trusted repository code. No
     # application package/factory or built executable is imported or invoked.
@@ -31,9 +35,11 @@ def main():
     rust = tomllib.loads(args.rust_manifest.read_text())['package']['version']
     binaries = {name: {'version': rust, 'sha256': hashlib.sha256(helper._read(
         args.binaries / name, 256 * 1024 * 1024)).hexdigest()} for name in ('mas', 'mas-gateway')}
-    record = {'format': 'mas-runtime-build/1', 'source_commit': args.source_commit or None,
+    record = {'format': 'mas-runtime-build/2', 'source_commit': args.source_commit or None,
         'release_tag': args.release_tag or None, 'host_version': host,
-        'package_sha256': helper.package_digest(package), 'binaries': binaries}
+        'package_sha256': helper.package_digest(package), 'binaries': binaries,
+        'source_repository': 'https://github.com/emmett08/mas-reference-host',
+        'protocol_source': {'repository': 'https://github.com/emmett08/mas', 'commit': protocol_revision}}
     (package / helper.BUILD_RECORD).write_text(json.dumps(record, sort_keys=True, indent=2) + '\n')
 
 

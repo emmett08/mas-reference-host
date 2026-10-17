@@ -1,0 +1,64 @@
+{
+  "format": "mas-workflow-overhead-benchmark/1",
+  "runtime": {
+    "python": "3.14.8",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "logical_cpus": 9
+  },
+  "workload": "Retained sequential prefix; existing-file growth under unchanged directory inventories",
+  "workflow": [
+    {
+      "strategy": "completed_node_replay",
+      "completed_prefix": 100,
+      "node_reads": 3060,
+      "median_ms": 194.7706475,
+      "p95_ms": 203.464873,
+      "total_ms": 5843.724531,
+      "samples": 30
+    },
+    {
+      "strategy": "durable_prefix",
+      "completed_prefix": 100,
+      "node_reads": 60,
+      "median_ms": 9.258288499999999,
+      "p95_ms": 9.767301,
+      "total_ms": 280.046794,
+      "samples": 30
+    }
+  ],
+  "storage": [
+    {
+      "strategy": "legacy_walk",
+      "admission_eligible": true,
+      "files": 1000,
+      "directory_listings": 3030,
+      "fresh_stat_calls": 33000,
+      "median_ms": 5.8665389999999995,
+      "p95_ms": 6.606761,
+      "total_ms": 178.850457,
+      "samples": 30
+    },
+    {
+      "strategy": "exact_index",
+      "admission_eligible": true,
+      "files": 1000,
+      "directory_listings": 3030,
+      "fresh_stat_calls": 33030,
+      "median_ms": 2.4275095,
+      "p95_ms": 2.850555,
+      "total_ms": 76.404241,
+      "samples": 30
+    },
+    {
+      "strategy": "inventory_estimate",
+      "admission_eligible": false,
+      "files": 1000,
+      "directory_listings": 0,
+      "fresh_stat_calls": 33030,
+      "median_ms": 1.8868559999999999,
+      "p95_ms": 2.188814,
+      "total_ms": 57.919984,
+      "samples": 30
+    }
+  ]
+}

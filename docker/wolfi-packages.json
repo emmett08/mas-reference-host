@@ -1,0 +1,1267 @@
+{
+  "format": "mas-wolfi-lock/1",
+  "repository": "https://packages.wolfi.dev/os",
+  "base_image": "cgr.dev/chainguard/wolfi-base@sha256:256c88bb066424045021090932d50be93c8e3f2ce3586707702a401b146f3e43",
+  "base_manifests": {
+    "x86_64": "sha256:030e45cb37187dff322bbefe9658bcaec31b824a5d523380771a64864c9f45d4",
+    "aarch64": "sha256:e02c7a98dc477e32e2f04ea2e827a132baace0fbeccb3781aa9c64ffc7982774"
+  },
+  "signing_key": {
+    "url": "https://packages.wolfi.dev/os/wolfi-signing.rsa.pub",
+    "sha256": "f0031424cf46f7db780ce63a45f0fd6aa6f85f601e6bb3b7a91fe3d4d5b7d2cc"
+  },
+  "roots": [
+    "python-3.14=3.14.8_git20261008-r1",
+    "libstdc++=16.2.0-r1",
+    "glibc-2.44=2.44-r8",
+    "ncurses=6.6.20261010-r0",
+    "wolfi-baselayout=20230201-r30",
+    "busybox=1.38.0-r3",
+    "apk-tools=2.14.10-r17",
+    "ca-certificates-bundle=20260909-r2"
+  ],
+  "indexes": {
+    "x86_64": {
+      "path": "docker/wolfi-indexes/x86_64/APKINDEX.tar.gz",
+      "sha256": "447ecd1f7497ab9cc065f998bd77c397dc35f037d6b828234699973c2c089794",
+      "size": 10525519,
+      "url": "https://packages.wolfi.dev/os/x86_64/APKINDEX.tar.gz"
+    },
+    "aarch64": {
+      "path": "docker/wolfi-indexes/aarch64/APKINDEX.tar.gz",
+      "sha256": "423f4248b3beab0971ec6f8dad68b768a3aa12a1f6598fb44dd11082b45b32f2",
+      "size": 10520093,
+      "url": "https://packages.wolfi.dev/os/aarch64/APKINDEX.tar.gz"
+    }
+  },
+  "runtime": {
+    "x86_64": [
+      {
+        "name": "apk-tools",
+        "version": "2.14.10-r17",
+        "filename": "apk-tools-2.14.10-r17.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/apk-tools-2.14.10-r17.apk",
+        "sha256": "0cfb6a78c8ab63ce09082ca99009164c4e43eed4bf49e8f57c3f688984f3762d",
+        "dependencies": [
+          "ca-certificates-bundle",
+          "merged-sbin",
+          "so:ld-linux-x86-64.so.2",
+          "so:libc.so.6",
+          "so:libcrypto.so.4",
+          "so:libssl.so.4",
+          "so:libz.so.1",
+          "wolfi-baselayout"
+        ],
+        "provides": [
+          "cmd:apk=2.14.10-r17",
+          "so-ver:libapk.so.2.14.10=2.14.10-r17",
+          "so:libapk.so.2.14.10=2.14.10"
+        ]
+      },
+      {
+        "name": "busybox",
+        "version": "1.38.0-r3",
+        "filename": "busybox-1.38.0-r3.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/busybox-1.38.0-r3.apk",
+        "sha256": "eeb563b77b93f040ed255a56b014a9c8f882a5651744f908577e1a3bc5ea9b3a",
+        "dependencies": [
+          "merged-bin",
+          "merged-sbin",
+          "merged-usrsbin",
+          "so:ld-linux-x86-64.so.2",
+          "so:libc.so.6",
+          "so:libcrypt.so.1",
+          "so:libm.so.6",
+          "wolfi-baselayout"
+        ],
+        "provides": [
+          "cmd:busybox=1.38.0-r3"
+        ]
+      },
+      {
+        "name": "ca-certificates-bundle",
+        "version": "20260909-r2",
+        "filename": "ca-certificates-bundle-20260909-r2.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/ca-certificates-bundle-20260909-r2.apk",
+        "sha256": "aa18190f42bd94e0a1cf4a4c44aa464ee95229a340fc5e851956e8ac0f906d77",
+        "dependencies": [
+          "merged-usrsbin",
+          "wolfi-baselayout"
+        ],
+        "provides": []
+      },
+      {
+        "name": "gdbm",
+        "version": "1.26-r7",
+        "filename": "gdbm-1.26-r7.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/gdbm-1.26-r7.apk",
+        "sha256": "b353e1fb3f7702fe2faba2fd6800bbfd3db63a726e17d294a626aacbf239629b",
+        "dependencies": [
+          "so:ld-linux-x86-64.so.2",
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "cmd:gdbm_dump=1.26-r7",
+          "cmd:gdbm_load=1.26-r7",
+          "cmd:gdbmtool=1.26-r7",
+          "so-ver:libgdbm.so.6=1.26-r7",
+          "so-ver:libgdbm_compat.so.4=1.26-r7",
+          "so:libgdbm.so.6=6",
+          "so:libgdbm_compat.so.4=4"
+        ]
+      },
+      {
+        "name": "glibc-2.44",
+        "version": "2.44-r8",
+        "filename": "glibc-2.44-2.44-r8.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/glibc-2.44-2.44-r8.apk",
+        "sha256": "e38603061dbeea4a647b2d46d454c954e8af89a495f9b2c07b51b590995a7da0",
+        "dependencies": [
+          "!musl",
+          "glibc-2.44-locale-posix",
+          "ld-linux-2.44=2.44-r8",
+          "libgcc",
+          "merged-lib",
+          "merged-sbin",
+          "merged-usrsbin",
+          "so:ld-linux-x86-64.so.2",
+          "wolfi-baselayout"
+        ],
+        "provides": [
+          "cmd:ldconfig=2.44-r8",
+          "glibc=2.44-r8",
+          "so-ver:libBrokenLocale.so.1=2.44-r8",
+          "so-ver:libanl.so.1=2.44-r8",
+          "so-ver:libc.so.6=2.44-r8",
+          "so-ver:libc_malloc_debug.so.0=2.44-r8",
+          "so-ver:libdl.so.2=2.44-r8",
+          "so-ver:libm.so.6=2.44-r8",
+          "so-ver:libmemusage.so=2.44-r8",
+          "so-ver:libmvec.so.1=2.44-r8",
+          "so-ver:libnsl.so.1=2.44-r8",
+          "so-ver:libnss_compat.so.2=2.44-r8",
+          "so-ver:libnss_dns.so.2=2.44-r8",
+          "so-ver:libnss_files.so.2=2.44-r8",
+          "so-ver:libpthread.so.0=2.44-r8",
+          "so-ver:libresolv.so.2=2.44-r8",
+          "so-ver:librt.so.1=2.44-r8",
+          "so-ver:libthread_db.so.1=2.44-r8",
+          "so-ver:libutil.so.1=2.44-r8",
+          "so:libBrokenLocale.so.1=1",
+          "so:libanl.so.1=1",
+          "so:libc.so.6=6",
+          "so:libc_malloc_debug.so.0=0",
+          "so:libdl.so.2=2",
+          "so:libm.so.6=6",
+          "so:libmemusage.so=0",
+          "so:libmvec.so.1=1",
+          "so:libnsl.so.1=1",
+          "so:libnss_compat.so.2=2",
+          "so:libnss_dns.so.2=2",
+          "so:libnss_files.so.2=2",
+          "so:libpthread.so.0=0",
+          "so:libresolv.so.2=2",
+          "so:librt.so.1=1",
+          "so:libthread_db.so.1=1",
+          "so:libutil.so.1=1"
+        ]
+      },
+      {
+        "name": "glibc-2.44-locale-posix",
+        "version": "2.44-r8",
+        "filename": "glibc-2.44-locale-posix-2.44-r8.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/glibc-2.44-locale-posix-2.44-r8.apk",
+        "sha256": "fb171f1e6f2ab314b5964e5b1ba5dbabf42ace912744e02c206f7d4bff32b284",
+        "dependencies": [
+          "merged-lib",
+          "merged-sbin",
+          "merged-usrsbin",
+          "wolfi-baselayout"
+        ],
+        "provides": [
+          "glibc-locale-posix=2.44-r8"
+        ]
+      },
+      {
+        "name": "ld-linux-2.44",
+        "version": "2.44-r8",
+        "filename": "ld-linux-2.44-2.44-r8.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/ld-linux-2.44-2.44-r8.apk",
+        "sha256": "e0c7e3b457c86a7d672a339a166ee13959356ac8a5b19ab4af5a771fee6c699f",
+        "dependencies": [
+          "glibc-2.44=2.44-r8",
+          "merged-lib",
+          "merged-sbin",
+          "merged-usrsbin",
+          "wolfi-baselayout"
+        ],
+        "provides": [
+          "ld-linux=2.44-r8",
+          "so-ver:ld-linux-x86-64.so.2=2.44-r8",
+          "so:ld-linux-x86-64.so.2=2"
+        ]
+      },
+      {
+        "name": "libbrotlicommon1",
+        "version": "1.2.0-r6",
+        "filename": "libbrotlicommon1-1.2.0-r6.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/libbrotlicommon1-1.2.0-r6.apk",
+        "sha256": "583c35b3ad7127def10d535cb7cadc636b64cdc289a49cf24f6d960e8bfcfaa0",
+        "dependencies": [
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "so-ver:libbrotlicommon.so.1=1.2.0-r6",
+          "so:libbrotlicommon.so.1=1"
+        ]
+      },
+      {
+        "name": "libbrotlidec1",
+        "version": "1.2.0-r6",
+        "filename": "libbrotlidec1-1.2.0-r6.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/libbrotlidec1-1.2.0-r6.apk",
+        "sha256": "d7d68feac257eaedce2e30289e19fc592b77eb9a78e1c2d6031e58a5b082c50b",
+        "dependencies": [
+          "so:libbrotlicommon.so.1",
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "so-ver:libbrotlidec.so.1=1.2.0-r6",
+          "so:libbrotlidec.so.1=1"
+        ]
+      },
+      {
+        "name": "libbrotlienc1",
+        "version": "1.2.0-r6",
+        "filename": "libbrotlienc1-1.2.0-r6.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/libbrotlienc1-1.2.0-r6.apk",
+        "sha256": "8a48aa008d75e7b0b201318b7fb129c4a6c44da2e2abf29b133af44d1567789c",
+        "dependencies": [
+          "so:libbrotlicommon.so.1",
+          "so:libc.so.6",
+          "so:libm.so.6"
+        ],
+        "provides": [
+          "so-ver:libbrotlienc.so.1=1.2.0-r6",
+          "so:libbrotlienc.so.1=1"
+        ]
+      },
+      {
+        "name": "libbz2-1",
+        "version": "1.0.8-r25",
+        "filename": "libbz2-1-1.0.8-r25.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/libbz2-1-1.0.8-r25.apk",
+        "sha256": "52d98e5a8b0ea3e1f301d565bf8c8fed6b106f881d9d120dbde0d38fbd4f9fb8",
+        "dependencies": [
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "so-ver:libbz2.so.1=1.0.8-r25",
+          "so:libbz2.so.1=1"
+        ]
+      },
+      {
+        "name": "libcrypt1-2.44",
+        "version": "2.44-r8",
+        "filename": "libcrypt1-2.44-2.44-r8.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/libcrypt1-2.44-2.44-r8.apk",
+        "sha256": "553ebdf51c301926dcb62e43396a550a5bfa8f7f5ce0544d59efc91356149695",
+        "dependencies": [
+          "glibc-2.44=2.44-r8",
+          "libxcrypt",
+          "merged-lib",
+          "merged-sbin",
+          "merged-usrsbin",
+          "wolfi-baselayout"
+        ],
+        "provides": [
+          "libcrypt1=2.44-r8",
+          "so:libcrypt.so.1=1"
+        ]
+      },
+      {
+        "name": "libexpat1",
+        "version": "2.9.0-r0",
+        "filename": "libexpat1-2.9.0-r0.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/libexpat1-2.9.0-r0.apk",
+        "sha256": "49291dad97f2292a5796c2cdb766f6476b274332ae2bbd3c35447d7f305f81a8",
+        "dependencies": [
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "so-ver:libexpat.so.1=2.9.0-r0",
+          "so:libexpat.so.1=1"
+        ]
+      },
+      {
+        "name": "libffi",
+        "version": "3.8.0-r2",
+        "filename": "libffi-3.8.0-r2.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/libffi-3.8.0-r2.apk",
+        "sha256": "93fe2f937802653775e8537c7a2840c6de8a1d83c396559be200c0d5d86375f6",
+        "dependencies": [
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "so-ver:libffi.so.8=3.8.0-r2",
+          "so:libffi.so.8=8"
+        ]
+      },
+      {
+        "name": "libgcc",
+        "version": "16.2.0-r1",
+        "filename": "libgcc-16.2.0-r1.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/libgcc-16.2.0-r1.apk",
+        "sha256": "6c41a73a5e07bfa17ff3fa6c64d0a898905168c780a04f2092eacb53545106db",
+        "dependencies": [
+          "so:ld-linux-x86-64.so.2",
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "libgcc-16=16.2.0-r1",
+          "so-ver:libgcc_s.so.1=16.2.0-r1",
+          "so:libgcc_s.so.1=1"
+        ]
+      },
+      {
+        "name": "libstdc++",
+        "version": "16.2.0-r1",
+        "filename": "libstdc++-16.2.0-r1.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/libstdc++-16.2.0-r1.apk",
+        "sha256": "fc233c091aa551d6ba6da3e444d99a94e9947d53814d20183a0a7ded9a668f80",
+        "dependencies": [
+          "so:ld-linux-x86-64.so.2",
+          "so:libc.so.6",
+          "so:libgcc_s.so.1",
+          "so:libm.so.6"
+        ],
+        "provides": [
+          "libstdc++-16=16.2.0-r1",
+          "so-ver:libstdc++.so.6=16.2.0-r1",
+          "so:libstdc++.so.6=6"
+        ]
+      },
+      {
+        "name": "libuuid",
+        "version": "2.42.4-r0",
+        "filename": "libuuid-2.42.4-r0.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/libuuid-2.42.4-r0.apk",
+        "sha256": "e1f5d85296afc0074e4d69fb3bdf7cb12b82233768ea5ad38330d53c76724785",
+        "dependencies": [
+          "merged-bin",
+          "merged-sbin",
+          "merged-usrsbin",
+          "so:libc.so.6",
+          "wolfi-baselayout"
+        ],
+        "provides": [
+          "so-ver:libuuid.so.1=2.42.4-r0",
+          "so:libuuid.so.1=1"
+        ]
+      },
+      {
+        "name": "libxcrypt",
+        "version": "4.5.2-r6",
+        "filename": "libxcrypt-4.5.2-r6.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/libxcrypt-4.5.2-r6.apk",
+        "sha256": "fab127bcb2474adc952b6c34a6e3f5c633672b47429a24fcc6fd719425aafb93",
+        "dependencies": [],
+        "provides": []
+      },
+      {
+        "name": "libzstd1",
+        "version": "1.5.7-r10",
+        "filename": "libzstd1-1.5.7-r10.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/libzstd1-1.5.7-r10.apk",
+        "sha256": "6660523fbffeca75cd601b0c61f201f0054a568bac72204bb13be0dba36da176",
+        "dependencies": [
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "so-ver:libzstd.so.1=1.5.7-r10",
+          "so:libzstd.so.1=1"
+        ]
+      },
+      {
+        "name": "mpdecimal",
+        "version": "4.0.1-r4",
+        "filename": "mpdecimal-4.0.1-r4.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/mpdecimal-4.0.1-r4.apk",
+        "sha256": "823156afdf095874d8e386ab453e69bf5677ab76dd249da7f6451929e6f9ccd4",
+        "dependencies": [
+          "so:ld-linux-x86-64.so.2",
+          "so:libc.so.6",
+          "so:libgcc_s.so.1",
+          "so:libm.so.6",
+          "so:libstdc++.so.6"
+        ],
+        "provides": [
+          "so-ver:libmpdec++.so.4=4.0.1-r4",
+          "so-ver:libmpdec.so.4=4.0.1-r4",
+          "so:libmpdec++.so.4=4",
+          "so:libmpdec.so.4=4"
+        ]
+      },
+      {
+        "name": "ncurses",
+        "version": "6.6.20261010-r0",
+        "filename": "ncurses-6.6.20261010-r0.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/ncurses-6.6.20261010-r0.apk",
+        "sha256": "475d8c2ec463637844149030a9cc3fc607782cfe681e3c16f80d2a6bc940bb63",
+        "dependencies": [
+          "ncurses-terminfo-base=6.6.20261010-r0",
+          "so:ld-linux-x86-64.so.2",
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "cmd:clear=6.6.20261010-r0",
+          "cmd:infocmp=6.6.20261010-r0",
+          "cmd:tabs=6.6.20261010-r0",
+          "cmd:tic=6.6.20261010-r0",
+          "cmd:toe=6.6.20261010-r0",
+          "cmd:tput=6.6.20261010-r0",
+          "cmd:tset=6.6.20261010-r0",
+          "so-ver:libform.so.6=6.6.20261010-r0",
+          "so-ver:libformw.so.6=6.6.20261010-r0",
+          "so-ver:libmenu.so.6=6.6.20261010-r0",
+          "so-ver:libmenuw.so.6=6.6.20261010-r0",
+          "so-ver:libncurses.so.6=6.6.20261010-r0",
+          "so-ver:libncursesw.so.6=6.6.20261010-r0",
+          "so-ver:libpanel.so.6=6.6.20261010-r0",
+          "so-ver:libpanelw.so.6=6.6.20261010-r0",
+          "so-ver:libtic.so.6=6.6.20261010-r0",
+          "so-ver:libtinfo.so.6=6.6.20261010-r0",
+          "so:libform.so.6=6",
+          "so:libformw.so.6=6",
+          "so:libmenu.so.6=6",
+          "so:libmenuw.so.6=6",
+          "so:libncurses.so.6=6",
+          "so:libncursesw.so.6=6",
+          "so:libpanel.so.6=6",
+          "so:libpanelw.so.6=6",
+          "so:libtic.so.6=6",
+          "so:libtinfo.so.6=6"
+        ]
+      },
+      {
+        "name": "ncurses-terminfo-base",
+        "version": "6.6.20261010-r0",
+        "filename": "ncurses-terminfo-base-6.6.20261010-r0.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/ncurses-terminfo-base-6.6.20261010-r0.apk",
+        "sha256": "fac2c47f1e85175a8cb6842c374b5462aa8a10d548b5d602d28ee7829b00a751",
+        "dependencies": [],
+        "provides": []
+      },
+      {
+        "name": "openssl-4.0-libcrypto",
+        "version": "4.0.3-r6",
+        "filename": "openssl-4.0-libcrypto-4.0.3-r6.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/openssl-4.0-libcrypto-4.0.3-r6.apk",
+        "sha256": "902627db5c736916f3ba34ca2ae95a034e877cd06b0636f4d01d1ceec81d331e",
+        "dependencies": [
+          "openssl-provider-legacy-allowed",
+          "so:libbrotlidec.so.1",
+          "so:libbrotlienc.so.1",
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "so-ver:libcrypto.so.4=4.0.3-r6",
+          "so:libcrypto.so.4=4"
+        ]
+      },
+      {
+        "name": "openssl-4.0-libssl",
+        "version": "4.0.3-r6",
+        "filename": "openssl-4.0-libssl-4.0.3-r6.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/openssl-4.0-libssl-4.0.3-r6.apk",
+        "sha256": "65e30d6a2cc79e9bf5f744b013451cd7267470ee61743f4d84418b51cf56ab73",
+        "dependencies": [
+          "so:libc.so.6",
+          "so:libcrypto.so.4"
+        ],
+        "provides": [
+          "so-ver:libssl.so.4=4.0.3-r6",
+          "so:libssl.so.4=4"
+        ]
+      },
+      {
+        "name": "openssl-provider-legacy-allowed",
+        "version": "4.0.3-r1",
+        "filename": "openssl-provider-legacy-allowed-4.0.3-r1.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/openssl-provider-legacy-allowed-4.0.3-r1.apk",
+        "sha256": "5617a56d9eeede758f0448e75e8459d518e6230a41626bc48f8fc00288790990",
+        "dependencies": [
+          "so:libc.so.6"
+        ],
+        "provides": []
+      },
+      {
+        "name": "py3-pip-wheel",
+        "version": "26.2.1-r4",
+        "filename": "py3-pip-wheel-26.2.1-r4.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/py3-pip-wheel-26.2.1-r4.apk",
+        "sha256": "9e7ff37eeaa621df6d066b9904a91555848c5c13db95dab7efd2ad67c11fae7a",
+        "dependencies": [],
+        "provides": []
+      },
+      {
+        "name": "python-3.14",
+        "version": "3.14.8_git20261008-r1",
+        "filename": "python-3.14-3.14.8_git20261008-r1.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/python-3.14-3.14.8_git20261008-r1.apk",
+        "sha256": "d22e52075ef8f5ada271e126c45cdc6e675830a6606de5ccf53ce9ad543a2321",
+        "dependencies": [
+          "python-3.14-base=3.14.8_git20261008-r1"
+        ],
+        "provides": [
+          "python-3=0",
+          "python3=0"
+        ]
+      },
+      {
+        "name": "python-3.14-base",
+        "version": "3.14.8_git20261008-r1",
+        "filename": "python-3.14-base-3.14.8_git20261008-r1.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/python-3.14-base-3.14.8_git20261008-r1.apk",
+        "sha256": "16bef8c43507b7159b0082c20476a532bf5fb2483e12618f4bf11a4f2be99145",
+        "dependencies": [
+          "py3-pip-wheel",
+          "so:ld-linux-x86-64.so.2",
+          "so:libbz2.so.1",
+          "so:libc.so.6",
+          "so:libcrypto.so.4",
+          "so:libexpat.so.1",
+          "so:libffi.so.8",
+          "so:libgdbm.so.6",
+          "so:libgdbm_compat.so.4",
+          "so:liblzma.so.5",
+          "so:libm.so.6",
+          "so:libmpdec.so.4",
+          "so:libncursesw.so.6",
+          "so:libpanelw.so.6",
+          "so:libreadline.so.8",
+          "so:libsqlite3.so.0",
+          "so:libssl.so.4",
+          "so:libtinfo.so.6",
+          "so:libuuid.so.1",
+          "so:libz.so.1",
+          "so:libzstd.so.1"
+        ],
+        "provides": [
+          "cmd:pydoc3.14=3.14.8_git20261008-r1",
+          "cmd:python3.14=3.14.8_git20261008-r1",
+          "so-ver:libpython3.14.so.1.0=3.14.8_git20261008-r1",
+          "so:libpython3.14.so.1.0=1.0"
+        ]
+      },
+      {
+        "name": "readline",
+        "version": "8.3-r3",
+        "filename": "readline-8.3-r3.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/readline-8.3-r3.apk",
+        "sha256": "bc694bcbfcf3d3d48c890b2701714269c9c0851a85c44bb5bf38347e4999f80b",
+        "dependencies": [
+          "so:libc.so.6",
+          "so:libtinfo.so.6"
+        ],
+        "provides": [
+          "so-ver:libhistory.so.8=8.3-r3",
+          "so-ver:libreadline.so.8=8.3-r3",
+          "so:libhistory.so.8=8",
+          "so:libreadline.so.8=8"
+        ]
+      },
+      {
+        "name": "sqlite-libs",
+        "version": "3.54.0-r0",
+        "filename": "sqlite-libs-3.54.0-r0.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/sqlite-libs-3.54.0-r0.apk",
+        "sha256": "3dbad4bc5618d05eb8efc2c2111575396db90591a96e716b82c152528e1c4ff4",
+        "dependencies": [
+          "so:libc.so.6",
+          "so:libm.so.6"
+        ],
+        "provides": [
+          "so-ver:libsqlite3.so.0=3.54.0-r0",
+          "so:libsqlite3.so.0=0"
+        ]
+      },
+      {
+        "name": "wolfi-baselayout",
+        "version": "20230201-r30",
+        "filename": "wolfi-baselayout-20230201-r30.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/wolfi-baselayout-20230201-r30.apk",
+        "sha256": "0544802d073dac63485309a64a1f533735580bbbaa18b83a59058676c040c2fb",
+        "dependencies": [
+          "ca-certificates-bundle"
+        ],
+        "provides": [
+          "merged-bin",
+          "merged-lib",
+          "merged-sbin",
+          "merged-usrsbin",
+          "merged-varrun"
+        ]
+      },
+      {
+        "name": "xz",
+        "version": "5.8.4-r0",
+        "filename": "xz-5.8.4-r0.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/xz-5.8.4-r0.apk",
+        "sha256": "d015b40af8b300a0a33e710573e1e7d6cdc31ae5124bcac2fd299bea90a8506a",
+        "dependencies": [
+          "so:ld-linux-x86-64.so.2",
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "cmd:lzmadec=5.8.4-r0",
+          "cmd:lzmainfo=5.8.4-r0",
+          "cmd:xz=5.8.4-r0",
+          "cmd:xzdec=5.8.4-r0",
+          "cmd:xzdiff=5.8.4-r0",
+          "cmd:xzgrep=5.8.4-r0",
+          "cmd:xzless=5.8.4-r0",
+          "cmd:xzmore=5.8.4-r0",
+          "so-ver:liblzma.so.5=5.8.4-r0",
+          "so:liblzma.so.5=5"
+        ]
+      },
+      {
+        "name": "zlib",
+        "version": "1.3.2.1_rc20260921-r0",
+        "filename": "zlib-1.3.2.1_rc20260921-r0.apk",
+        "url": "https://packages.wolfi.dev/os/x86_64/zlib-1.3.2.1_rc20260921-r0.apk",
+        "sha256": "f84ebe39e0e002274e8d75955c4aaf5eb9854f2e5f6e1f84df01ef26df7a8153",
+        "dependencies": [
+          "merged-lib",
+          "so:libc.so.6",
+          "wolfi-baselayout"
+        ],
+        "provides": [
+          "so-ver:libz.so.1=1.3.2.1_rc20260921-r0",
+          "so:libz.so.1=1"
+        ]
+      }
+    ],
+    "aarch64": [
+      {
+        "name": "apk-tools",
+        "version": "2.14.10-r17",
+        "filename": "apk-tools-2.14.10-r17.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/apk-tools-2.14.10-r17.apk",
+        "sha256": "e47cba0d71639b0116f4b287e148c1521d82ee7a7ad8f593ffb6a5cd7de62fa6",
+        "dependencies": [
+          "ca-certificates-bundle",
+          "merged-sbin",
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6",
+          "so:libcrypto.so.4",
+          "so:libssl.so.4",
+          "so:libz.so.1",
+          "wolfi-baselayout"
+        ],
+        "provides": [
+          "cmd:apk=2.14.10-r17",
+          "so-ver:libapk.so.2.14.10=2.14.10-r17",
+          "so:libapk.so.2.14.10=2.14.10"
+        ]
+      },
+      {
+        "name": "busybox",
+        "version": "1.38.0-r3",
+        "filename": "busybox-1.38.0-r3.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/busybox-1.38.0-r3.apk",
+        "sha256": "c1add921f52eb8d25bc4f451c0fd6c1f38708fdd87f03015e429886b23ddbdfd",
+        "dependencies": [
+          "merged-bin",
+          "merged-sbin",
+          "merged-usrsbin",
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6",
+          "so:libcrypt.so.1",
+          "so:libm.so.6",
+          "wolfi-baselayout"
+        ],
+        "provides": [
+          "cmd:busybox=1.38.0-r3"
+        ]
+      },
+      {
+        "name": "ca-certificates-bundle",
+        "version": "20260909-r2",
+        "filename": "ca-certificates-bundle-20260909-r2.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/ca-certificates-bundle-20260909-r2.apk",
+        "sha256": "1df0297183deabef6759a48a21a02bb18d87e8189c6b5d139f9dd5c52398ed19",
+        "dependencies": [
+          "merged-usrsbin",
+          "wolfi-baselayout"
+        ],
+        "provides": []
+      },
+      {
+        "name": "gdbm",
+        "version": "1.26-r7",
+        "filename": "gdbm-1.26-r7.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/gdbm-1.26-r7.apk",
+        "sha256": "a270fa788b8807ad6c893c2eaa8e56b48a3d0debe05ad2b6192b8794c18c63dc",
+        "dependencies": [
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "cmd:gdbm_dump=1.26-r7",
+          "cmd:gdbm_load=1.26-r7",
+          "cmd:gdbmtool=1.26-r7",
+          "so-ver:libgdbm.so.6=1.26-r7",
+          "so-ver:libgdbm_compat.so.4=1.26-r7",
+          "so:libgdbm.so.6=6",
+          "so:libgdbm_compat.so.4=4"
+        ]
+      },
+      {
+        "name": "glibc-2.44",
+        "version": "2.44-r8",
+        "filename": "glibc-2.44-2.44-r8.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/glibc-2.44-2.44-r8.apk",
+        "sha256": "596770ccfb1da12b33f99ae32a6f8df2758f3f45b65f4a4dbc008b226831f755",
+        "dependencies": [
+          "!musl",
+          "glibc-2.44-locale-posix",
+          "ld-linux-2.44=2.44-r8",
+          "libgcc",
+          "merged-lib",
+          "merged-sbin",
+          "merged-usrsbin",
+          "so:ld-linux-aarch64.so.1",
+          "wolfi-baselayout"
+        ],
+        "provides": [
+          "cmd:ldconfig=2.44-r8",
+          "glibc=2.44-r8",
+          "so-ver:libBrokenLocale.so.1=2.44-r8",
+          "so-ver:libanl.so.1=2.44-r8",
+          "so-ver:libc.so.6=2.44-r8",
+          "so-ver:libc_malloc_debug.so.0=2.44-r8",
+          "so-ver:libdl.so.2=2.44-r8",
+          "so-ver:libm.so.6=2.44-r8",
+          "so-ver:libmemusage.so=2.44-r8",
+          "so-ver:libmvec.so.1=2.44-r8",
+          "so-ver:libnsl.so.1=2.44-r8",
+          "so-ver:libnss_compat.so.2=2.44-r8",
+          "so-ver:libnss_dns.so.2=2.44-r8",
+          "so-ver:libnss_files.so.2=2.44-r8",
+          "so-ver:libpthread.so.0=2.44-r8",
+          "so-ver:libresolv.so.2=2.44-r8",
+          "so-ver:librt.so.1=2.44-r8",
+          "so-ver:libthread_db.so.1=2.44-r8",
+          "so-ver:libutil.so.1=2.44-r8",
+          "so:libBrokenLocale.so.1=1",
+          "so:libanl.so.1=1",
+          "so:libc.so.6=6",
+          "so:libc_malloc_debug.so.0=0",
+          "so:libdl.so.2=2",
+          "so:libm.so.6=6",
+          "so:libmemusage.so=0",
+          "so:libmvec.so.1=1",
+          "so:libnsl.so.1=1",
+          "so:libnss_compat.so.2=2",
+          "so:libnss_dns.so.2=2",
+          "so:libnss_files.so.2=2",
+          "so:libpthread.so.0=0",
+          "so:libresolv.so.2=2",
+          "so:librt.so.1=1",
+          "so:libthread_db.so.1=1",
+          "so:libutil.so.1=1"
+        ]
+      },
+      {
+        "name": "glibc-2.44-locale-posix",
+        "version": "2.44-r8",
+        "filename": "glibc-2.44-locale-posix-2.44-r8.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/glibc-2.44-locale-posix-2.44-r8.apk",
+        "sha256": "4afead29830d9d30249421446a9eda776799a587c5c40320fc90480774cde7eb",
+        "dependencies": [
+          "merged-lib",
+          "merged-sbin",
+          "merged-usrsbin",
+          "wolfi-baselayout"
+        ],
+        "provides": [
+          "glibc-locale-posix=2.44-r8"
+        ]
+      },
+      {
+        "name": "ld-linux-2.44",
+        "version": "2.44-r8",
+        "filename": "ld-linux-2.44-2.44-r8.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/ld-linux-2.44-2.44-r8.apk",
+        "sha256": "cfaadae4440edabd696372e229f8a0903ebb0ad0ac0d9224df67686ec36468e3",
+        "dependencies": [
+          "glibc-2.44=2.44-r8",
+          "merged-lib",
+          "merged-sbin",
+          "merged-usrsbin",
+          "wolfi-baselayout"
+        ],
+        "provides": [
+          "ld-linux=2.44-r8",
+          "so-ver:ld-linux-aarch64.so.1=2.44-r8",
+          "so:ld-linux-aarch64.so.1=1"
+        ]
+      },
+      {
+        "name": "libbrotlicommon1",
+        "version": "1.2.0-r6",
+        "filename": "libbrotlicommon1-1.2.0-r6.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/libbrotlicommon1-1.2.0-r6.apk",
+        "sha256": "32cdc59e30d8371db89b4a1c7d7193da373296f9ce73dd1eb4b7bae3f0e25213",
+        "dependencies": [
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "so-ver:libbrotlicommon.so.1=1.2.0-r6",
+          "so:libbrotlicommon.so.1=1"
+        ]
+      },
+      {
+        "name": "libbrotlidec1",
+        "version": "1.2.0-r6",
+        "filename": "libbrotlidec1-1.2.0-r6.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/libbrotlidec1-1.2.0-r6.apk",
+        "sha256": "a54b46ab565a1574d8fa51ac4c6dfda905edab0911e6790a28cc01e9b5f23816",
+        "dependencies": [
+          "so:ld-linux-aarch64.so.1",
+          "so:libbrotlicommon.so.1",
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "so-ver:libbrotlidec.so.1=1.2.0-r6",
+          "so:libbrotlidec.so.1=1"
+        ]
+      },
+      {
+        "name": "libbrotlienc1",
+        "version": "1.2.0-r6",
+        "filename": "libbrotlienc1-1.2.0-r6.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/libbrotlienc1-1.2.0-r6.apk",
+        "sha256": "975753920483993ed2133d53d3ca8a2128c620d08939222f081c6fda03847a85",
+        "dependencies": [
+          "so:ld-linux-aarch64.so.1",
+          "so:libbrotlicommon.so.1",
+          "so:libc.so.6",
+          "so:libm.so.6"
+        ],
+        "provides": [
+          "so-ver:libbrotlienc.so.1=1.2.0-r6",
+          "so:libbrotlienc.so.1=1"
+        ]
+      },
+      {
+        "name": "libbz2-1",
+        "version": "1.0.8-r25",
+        "filename": "libbz2-1-1.0.8-r25.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/libbz2-1-1.0.8-r25.apk",
+        "sha256": "0362a42863c5a4c71718b7c2cbac457be38d38b4ff80bd052162d7121e39b959",
+        "dependencies": [
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "so-ver:libbz2.so.1=1.0.8-r25",
+          "so:libbz2.so.1=1"
+        ]
+      },
+      {
+        "name": "libcrypt1-2.44",
+        "version": "2.44-r8",
+        "filename": "libcrypt1-2.44-2.44-r8.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/libcrypt1-2.44-2.44-r8.apk",
+        "sha256": "2b97c6d01bd90161ccd72f35c32cd6b34c2d08eeb5a1567f7b3157b7b7bbfe75",
+        "dependencies": [
+          "glibc-2.44=2.44-r8",
+          "libxcrypt",
+          "merged-lib",
+          "merged-sbin",
+          "merged-usrsbin",
+          "wolfi-baselayout"
+        ],
+        "provides": [
+          "libcrypt1=2.44-r8",
+          "so:libcrypt.so.1=1"
+        ]
+      },
+      {
+        "name": "libexpat1",
+        "version": "2.9.0-r0",
+        "filename": "libexpat1-2.9.0-r0.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/libexpat1-2.9.0-r0.apk",
+        "sha256": "abeeb0ffa21b3ca6175cb997d9919920a26a2f50aaa61116f03ed40b1cfd764f",
+        "dependencies": [
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "so-ver:libexpat.so.1=2.9.0-r0",
+          "so:libexpat.so.1=1"
+        ]
+      },
+      {
+        "name": "libffi",
+        "version": "3.8.0-r2",
+        "filename": "libffi-3.8.0-r2.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/libffi-3.8.0-r2.apk",
+        "sha256": "df5cab585fd544ce671305dc8b8187bb1ed0c8ac016e995dd129d8d6dd9c556b",
+        "dependencies": [
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "so-ver:libffi.so.8=3.8.0-r2",
+          "so:libffi.so.8=8"
+        ]
+      },
+      {
+        "name": "libgcc",
+        "version": "16.2.0-r1",
+        "filename": "libgcc-16.2.0-r1.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/libgcc-16.2.0-r1.apk",
+        "sha256": "9fc6555eab9f14e996649426ffb2a5bf17e34e3410a151a7d9ad7c92eb21885d",
+        "dependencies": [
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "libgcc-16=16.2.0-r1",
+          "so-ver:libgcc_s.so.1=16.2.0-r1",
+          "so:libgcc_s.so.1=1"
+        ]
+      },
+      {
+        "name": "libstdc++",
+        "version": "16.2.0-r1",
+        "filename": "libstdc++-16.2.0-r1.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/libstdc++-16.2.0-r1.apk",
+        "sha256": "02f7d7bec8e641734b52855a33ff5474d6b0c0be24e9244b76c20c3f48c20768",
+        "dependencies": [
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6",
+          "so:libgcc_s.so.1",
+          "so:libm.so.6"
+        ],
+        "provides": [
+          "libstdc++-16=16.2.0-r1",
+          "so-ver:libstdc++.so.6=16.2.0-r1",
+          "so:libstdc++.so.6=6"
+        ]
+      },
+      {
+        "name": "libuuid",
+        "version": "2.42.4-r0",
+        "filename": "libuuid-2.42.4-r0.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/libuuid-2.42.4-r0.apk",
+        "sha256": "26c803afc91b4b027dd5fd9731745b43d8fe3b497988ecb74cee8a9a468a6632",
+        "dependencies": [
+          "merged-bin",
+          "merged-sbin",
+          "merged-usrsbin",
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6",
+          "wolfi-baselayout"
+        ],
+        "provides": [
+          "so-ver:libuuid.so.1=2.42.4-r0",
+          "so:libuuid.so.1=1"
+        ]
+      },
+      {
+        "name": "libxcrypt",
+        "version": "4.5.2-r6",
+        "filename": "libxcrypt-4.5.2-r6.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/libxcrypt-4.5.2-r6.apk",
+        "sha256": "9dfd2b4a72d35a1f2c146a968c2368d7cab51bc7ae7854e3dc61e8a98dfeb746",
+        "dependencies": [],
+        "provides": []
+      },
+      {
+        "name": "libzstd1",
+        "version": "1.5.7-r10",
+        "filename": "libzstd1-1.5.7-r10.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/libzstd1-1.5.7-r10.apk",
+        "sha256": "a8d3bdad5a5700bd7d273f110defd4401595b4ecde88be04b3019a31981bd4f8",
+        "dependencies": [
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "so-ver:libzstd.so.1=1.5.7-r10",
+          "so:libzstd.so.1=1"
+        ]
+      },
+      {
+        "name": "mpdecimal",
+        "version": "4.0.1-r4",
+        "filename": "mpdecimal-4.0.1-r4.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/mpdecimal-4.0.1-r4.apk",
+        "sha256": "2d5ab7801739a0f728bce26535f6f521bb88e6ac1915a46aa9a1d3a9c52e4b8e",
+        "dependencies": [
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6",
+          "so:libgcc_s.so.1",
+          "so:libm.so.6",
+          "so:libstdc++.so.6"
+        ],
+        "provides": [
+          "so-ver:libmpdec++.so.4=4.0.1-r4",
+          "so-ver:libmpdec.so.4=4.0.1-r4",
+          "so:libmpdec++.so.4=4",
+          "so:libmpdec.so.4=4"
+        ]
+      },
+      {
+        "name": "ncurses",
+        "version": "6.6.20261010-r0",
+        "filename": "ncurses-6.6.20261010-r0.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/ncurses-6.6.20261010-r0.apk",
+        "sha256": "cadab9fd50b2598d0133e4b03699d63d7b01823e53850a2beca24882577a0e61",
+        "dependencies": [
+          "ncurses-terminfo-base=6.6.20261010-r0",
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "cmd:clear=6.6.20261010-r0",
+          "cmd:infocmp=6.6.20261010-r0",
+          "cmd:tabs=6.6.20261010-r0",
+          "cmd:tic=6.6.20261010-r0",
+          "cmd:toe=6.6.20261010-r0",
+          "cmd:tput=6.6.20261010-r0",
+          "cmd:tset=6.6.20261010-r0",
+          "so-ver:libform.so.6=6.6.20261010-r0",
+          "so-ver:libformw.so.6=6.6.20261010-r0",
+          "so-ver:libmenu.so.6=6.6.20261010-r0",
+          "so-ver:libmenuw.so.6=6.6.20261010-r0",
+          "so-ver:libncurses.so.6=6.6.20261010-r0",
+          "so-ver:libncursesw.so.6=6.6.20261010-r0",
+          "so-ver:libpanel.so.6=6.6.20261010-r0",
+          "so-ver:libpanelw.so.6=6.6.20261010-r0",
+          "so-ver:libtic.so.6=6.6.20261010-r0",
+          "so-ver:libtinfo.so.6=6.6.20261010-r0",
+          "so:libform.so.6=6",
+          "so:libformw.so.6=6",
+          "so:libmenu.so.6=6",
+          "so:libmenuw.so.6=6",
+          "so:libncurses.so.6=6",
+          "so:libncursesw.so.6=6",
+          "so:libpanel.so.6=6",
+          "so:libpanelw.so.6=6",
+          "so:libtic.so.6=6",
+          "so:libtinfo.so.6=6"
+        ]
+      },
+      {
+        "name": "ncurses-terminfo-base",
+        "version": "6.6.20261010-r0",
+        "filename": "ncurses-terminfo-base-6.6.20261010-r0.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/ncurses-terminfo-base-6.6.20261010-r0.apk",
+        "sha256": "00dc0acc80c4d69795455862429b2c31f433f8d5d55e8b20543f7be3479d87cd",
+        "dependencies": [],
+        "provides": []
+      },
+      {
+        "name": "openssl-4.0-libcrypto",
+        "version": "4.0.3-r6",
+        "filename": "openssl-4.0-libcrypto-4.0.3-r6.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/openssl-4.0-libcrypto-4.0.3-r6.apk",
+        "sha256": "e9791467e2bd87c9c01b6647c3649dd679d8d364cd1052a6e6df3bd88efb2623",
+        "dependencies": [
+          "openssl-provider-legacy-allowed",
+          "so:ld-linux-aarch64.so.1",
+          "so:libbrotlidec.so.1",
+          "so:libbrotlienc.so.1",
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "so-ver:libcrypto.so.4=4.0.3-r6",
+          "so:libcrypto.so.4=4"
+        ]
+      },
+      {
+        "name": "openssl-4.0-libssl",
+        "version": "4.0.3-r6",
+        "filename": "openssl-4.0-libssl-4.0.3-r6.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/openssl-4.0-libssl-4.0.3-r6.apk",
+        "sha256": "9d8225619c2087539b7e284a7fc7278801e1772efe0858c8f4cb8356c2cffe34",
+        "dependencies": [
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6",
+          "so:libcrypto.so.4"
+        ],
+        "provides": [
+          "so-ver:libssl.so.4=4.0.3-r6",
+          "so:libssl.so.4=4"
+        ]
+      },
+      {
+        "name": "openssl-provider-legacy-allowed",
+        "version": "4.0.3-r1",
+        "filename": "openssl-provider-legacy-allowed-4.0.3-r1.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/openssl-provider-legacy-allowed-4.0.3-r1.apk",
+        "sha256": "3388792e95dee1468c10a12670bda28ff10f48d1eb6b4024abd06c9d96ffbd75",
+        "dependencies": [
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6"
+        ],
+        "provides": []
+      },
+      {
+        "name": "py3-pip-wheel",
+        "version": "26.2.1-r4",
+        "filename": "py3-pip-wheel-26.2.1-r4.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/py3-pip-wheel-26.2.1-r4.apk",
+        "sha256": "24bb824aca18e4046a577164a3a715fc5eebe92902fcb28f2f08ab4fbd68dcb2",
+        "dependencies": [],
+        "provides": []
+      },
+      {
+        "name": "python-3.14",
+        "version": "3.14.8_git20261008-r1",
+        "filename": "python-3.14-3.14.8_git20261008-r1.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/python-3.14-3.14.8_git20261008-r1.apk",
+        "sha256": "386cac21a8ddaf4830fe73fb2df58d30d9ef673b291b81e5c560ddb2112a6405",
+        "dependencies": [
+          "python-3.14-base=3.14.8_git20261008-r1"
+        ],
+        "provides": [
+          "python-3=0",
+          "python3=0"
+        ]
+      },
+      {
+        "name": "python-3.14-base",
+        "version": "3.14.8_git20261008-r1",
+        "filename": "python-3.14-base-3.14.8_git20261008-r1.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/python-3.14-base-3.14.8_git20261008-r1.apk",
+        "sha256": "dd3baffddbd1cfffc53413cda2b0f054712177f5c21395ac4104487b1cf1cae4",
+        "dependencies": [
+          "py3-pip-wheel",
+          "so:ld-linux-aarch64.so.1",
+          "so:libbz2.so.1",
+          "so:libc.so.6",
+          "so:libcrypto.so.4",
+          "so:libexpat.so.1",
+          "so:libffi.so.8",
+          "so:libgdbm.so.6",
+          "so:libgdbm_compat.so.4",
+          "so:liblzma.so.5",
+          "so:libm.so.6",
+          "so:libmpdec.so.4",
+          "so:libncursesw.so.6",
+          "so:libpanelw.so.6",
+          "so:libreadline.so.8",
+          "so:libsqlite3.so.0",
+          "so:libssl.so.4",
+          "so:libtinfo.so.6",
+          "so:libuuid.so.1",
+          "so:libz.so.1",
+          "so:libzstd.so.1"
+        ],
+        "provides": [
+          "cmd:pydoc3.14=3.14.8_git20261008-r1",
+          "cmd:python3.14=3.14.8_git20261008-r1",
+          "so-ver:libpython3.14.so.1.0=3.14.8_git20261008-r1",
+          "so:libpython3.14.so.1.0=1.0"
+        ]
+      },
+      {
+        "name": "readline",
+        "version": "8.3-r3",
+        "filename": "readline-8.3-r3.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/readline-8.3-r3.apk",
+        "sha256": "8d4ae6286e3fdc2b50fdd911fe1aa474c771c5708184e721e2255283ec6d7e4e",
+        "dependencies": [
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6",
+          "so:libtinfo.so.6"
+        ],
+        "provides": [
+          "so-ver:libhistory.so.8=8.3-r3",
+          "so-ver:libreadline.so.8=8.3-r3",
+          "so:libhistory.so.8=8",
+          "so:libreadline.so.8=8"
+        ]
+      },
+      {
+        "name": "sqlite-libs",
+        "version": "3.54.0-r0",
+        "filename": "sqlite-libs-3.54.0-r0.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/sqlite-libs-3.54.0-r0.apk",
+        "sha256": "5a4ea4896b4e0183c265a1183811eb519ac6a1f804c0e89d3a65523a542d6d9c",
+        "dependencies": [
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6",
+          "so:libm.so.6"
+        ],
+        "provides": [
+          "so-ver:libsqlite3.so.0=3.54.0-r0",
+          "so:libsqlite3.so.0=0"
+        ]
+      },
+      {
+        "name": "wolfi-baselayout",
+        "version": "20230201-r30",
+        "filename": "wolfi-baselayout-20230201-r30.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/wolfi-baselayout-20230201-r30.apk",
+        "sha256": "2a6815ada2973deba196e24f4406fcd2619f6a070e693013563530705254a2b8",
+        "dependencies": [
+          "ca-certificates-bundle"
+        ],
+        "provides": [
+          "merged-bin",
+          "merged-lib",
+          "merged-sbin",
+          "merged-usrsbin",
+          "merged-varrun"
+        ]
+      },
+      {
+        "name": "xz",
+        "version": "5.8.4-r0",
+        "filename": "xz-5.8.4-r0.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/xz-5.8.4-r0.apk",
+        "sha256": "d2c12615a9601d34f1500a782c38177d18417c576fe7b145e4e88b0165681874",
+        "dependencies": [
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6"
+        ],
+        "provides": [
+          "cmd:lzmadec=5.8.4-r0",
+          "cmd:lzmainfo=5.8.4-r0",
+          "cmd:xz=5.8.4-r0",
+          "cmd:xzdec=5.8.4-r0",
+          "cmd:xzdiff=5.8.4-r0",
+          "cmd:xzgrep=5.8.4-r0",
+          "cmd:xzless=5.8.4-r0",
+          "cmd:xzmore=5.8.4-r0",
+          "so-ver:liblzma.so.5=5.8.4-r0",
+          "so:liblzma.so.5=5"
+        ]
+      },
+      {
+        "name": "zlib",
+        "version": "1.3.2.1_rc20260921-r0",
+        "filename": "zlib-1.3.2.1_rc20260921-r0.apk",
+        "url": "https://packages.wolfi.dev/os/aarch64/zlib-1.3.2.1_rc20260921-r0.apk",
+        "sha256": "8342eefd2c6281ddeafbf0b770c0670c4e3099929cc938aa7662d7a5bd509644",
+        "dependencies": [
+          "merged-lib",
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6",
+          "wolfi-baselayout"
+        ],
+        "provides": [
+          "so-ver:libz.so.1=1.3.2.1_rc20260921-r0",
+          "so:libz.so.1=1"
+        ]
+      }
+    ]
+  }
+}

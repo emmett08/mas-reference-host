@@ -1,0 +1,191 @@
+{
+  "build": {
+    "aarch64": [
+      {
+        "dependencies": "",
+        "filename": "musl-1.2.6-r2.apk",
+        "name": "musl",
+        "sha256": "5e9674b7f41152fe2119093b5cb4c13eaaadb19c2d5422b2d7267913e663ee6e",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/aarch64/musl-1.2.6-r2.apk",
+        "version": "1.2.6-r2"
+      },
+      {
+        "dependencies": "musl=1.2.6-r2",
+        "filename": "musl-dev-1.2.6-r2.apk",
+        "name": "musl-dev",
+        "sha256": "ca72b84f4eb3c36bbbec04d919eb10159d414c7a43413cc2253841d301fa9486",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/aarch64/musl-dev-1.2.6-r2.apk",
+        "version": "1.2.6-r2"
+      },
+      {
+        "dependencies": "so:libc.musl-aarch64.so.1",
+        "filename": "pkgconf-2.5.1-r0.apk",
+        "name": "pkgconf",
+        "sha256": "6b716719ac9457bd35c8ea5373da1dc33ae86863bbb0f411aed0cb5e71b9cf2d",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/aarch64/pkgconf-2.5.1-r0.apk",
+        "version": "2.5.1-r0"
+      },
+      {
+        "dependencies": "so:libc.musl-aarch64.so.1 so:libreadline.so.8",
+        "filename": "sqlite-3.53.4-r0.apk",
+        "name": "sqlite",
+        "sha256": "753f39e446fa0208a58323147e568326c8426454dc4f7ccc4b375d7e6dd19b3b",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/aarch64/sqlite-3.53.4-r0.apk",
+        "version": "3.53.4-r0"
+      },
+      {
+        "dependencies": "sqlite=3.53.4-r0 sqlite-libs=3.53.4-r0 pkgconfig",
+        "filename": "sqlite-dev-3.53.4-r0.apk",
+        "name": "sqlite-dev",
+        "sha256": "1f407625d425902a7230a62edb80aba78470277a55a4edd5dac3d4e087e15495",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/aarch64/sqlite-dev-3.53.4-r0.apk",
+        "version": "3.53.4-r0"
+      },
+      {
+        "dependencies": "so:libc.musl-aarch64.so.1",
+        "filename": "sqlite-libs-3.53.4-r0.apk",
+        "name": "sqlite-libs",
+        "sha256": "b39d8d73c1208838a436f2d481ba605b52a095f8d6ff781556eafc81cd1a13e9",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/aarch64/sqlite-libs-3.53.4-r0.apk",
+        "version": "3.53.4-r0"
+      },
+      {
+        "dependencies": "so:libc.musl-aarch64.so.1 so:libncursesw.so.6",
+        "filename": "readline-8.3.3-r1.apk",
+        "name": "readline",
+        "sha256": "9f0ae0923c02b0d6aba62e9173542b65396ba3f0efefcbf087ea32f1120e7b34",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/aarch64/readline-8.3.3-r1.apk",
+        "version": "8.3.3-r1"
+      },
+      {
+        "dependencies": "ncurses-terminfo-base=6.6_p20260516-r0 so:libc.musl-aarch64.so.1",
+        "filename": "libncursesw-6.6_p20260516-r0.apk",
+        "name": "libncursesw",
+        "sha256": "51a7aa4b3ec40b144d0801c0544e0a9f62e2a41d04b6067bb5e95786040741c6",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/aarch64/libncursesw-6.6_p20260516-r0.apk",
+        "version": "6.6_p20260516-r0"
+      },
+      {
+        "dependencies": "",
+        "filename": "ncurses-terminfo-base-6.6_p20260516-r0.apk",
+        "name": "ncurses-terminfo-base",
+        "sha256": "e0c546b9461bdce206a90bc720cb69aa4628b5a5b8d908c3e5084e00f28f6a9d",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/aarch64/ncurses-terminfo-base-6.6_p20260516-r0.apk",
+        "version": "6.6_p20260516-r0"
+      }
+    ],
+    "x86_64": [
+      {
+        "dependencies": "",
+        "filename": "musl-1.2.6-r2.apk",
+        "name": "musl",
+        "sha256": "573712e2f49c15bfc20a2699f204acdfc74c772722b15e7353d768057fae0e71",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/musl-1.2.6-r2.apk",
+        "version": "1.2.6-r2"
+      },
+      {
+        "dependencies": "musl=1.2.6-r2",
+        "filename": "musl-dev-1.2.6-r2.apk",
+        "name": "musl-dev",
+        "sha256": "6831e8b9e4821dae2c9121f0641f81e543f4ac27c03144c4876980ee84e6988f",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/musl-dev-1.2.6-r2.apk",
+        "version": "1.2.6-r2"
+      },
+      {
+        "dependencies": "so:libc.musl-x86_64.so.1",
+        "filename": "pkgconf-2.5.1-r0.apk",
+        "name": "pkgconf",
+        "sha256": "20cc47b76b82e9424a35ecc4fdd7bd904ef49ada1684214910fae31bc0cab737",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/pkgconf-2.5.1-r0.apk",
+        "version": "2.5.1-r0"
+      },
+      {
+        "dependencies": "so:libc.musl-x86_64.so.1 so:libreadline.so.8",
+        "filename": "sqlite-3.53.4-r0.apk",
+        "name": "sqlite",
+        "sha256": "c51f4aae4fdbbec678639cdaa7af6758eef331dbf7299e2777fa7020b41ff194",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/sqlite-3.53.4-r0.apk",
+        "version": "3.53.4-r0"
+      },
+      {
+        "dependencies": "sqlite=3.53.4-r0 sqlite-libs=3.53.4-r0 pkgconfig",
+        "filename": "sqlite-dev-3.53.4-r0.apk",
+        "name": "sqlite-dev",
+        "sha256": "c30a6155ebd456f37524242c2a60690e516666fa487fba6630280e7ecdf9442f",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/sqlite-dev-3.53.4-r0.apk",
+        "version": "3.53.4-r0"
+      },
+      {
+        "dependencies": "so:libc.musl-x86_64.so.1",
+        "filename": "sqlite-libs-3.53.4-r0.apk",
+        "name": "sqlite-libs",
+        "sha256": "a8a216e53d22faa3f04d2e3650c1991af66f8d0b42fadff5afcdb9afb60b19e5",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/sqlite-libs-3.53.4-r0.apk",
+        "version": "3.53.4-r0"
+      },
+      {
+        "dependencies": "so:libc.musl-x86_64.so.1 so:libncursesw.so.6",
+        "filename": "readline-8.3.3-r1.apk",
+        "name": "readline",
+        "sha256": "766911ecb986a6c5cf0841a6b556cd1e9dbbf22b3559726de32416486cd15c81",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/readline-8.3.3-r1.apk",
+        "version": "8.3.3-r1"
+      },
+      {
+        "dependencies": "ncurses-terminfo-base=6.6_p20260516-r0 so:libc.musl-x86_64.so.1",
+        "filename": "libncursesw-6.6_p20260516-r0.apk",
+        "name": "libncursesw",
+        "sha256": "cf8caa8a88bc4ce9d9e395567fefaf9ef7fbd55c50ae6155b35c1b58f3755023",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/libncursesw-6.6_p20260516-r0.apk",
+        "version": "6.6_p20260516-r0"
+      },
+      {
+        "dependencies": "",
+        "filename": "ncurses-terminfo-base-6.6_p20260516-r0.apk",
+        "name": "ncurses-terminfo-base",
+        "sha256": "ce83be6d0bd10584a53c3a5868cc1595ce5f0f8e0b621f8f7f70b6144e521fc9",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/ncurses-terminfo-base-6.6_p20260516-r0.apk",
+        "version": "6.6_p20260516-r0"
+      }
+    ]
+  },
+  "format": "mas-apk-lock/1",
+  "runtime": {
+    "aarch64": [
+      {
+        "dependencies": "so:libc.musl-aarch64.so.1",
+        "filename": "libgcc-15.2.0-r5.apk",
+        "name": "libgcc",
+        "sha256": "369aaa6e9d099a737bad6dd3e6c2fe7bb1547ca26d22b94ee0411228f709b403",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/aarch64/libgcc-15.2.0-r5.apk",
+        "version": "15.2.0-r5"
+      },
+      {
+        "dependencies": "so:libc.musl-aarch64.so.1",
+        "filename": "sqlite-libs-3.53.4-r0.apk",
+        "name": "sqlite-libs",
+        "sha256": "b39d8d73c1208838a436f2d481ba605b52a095f8d6ff781556eafc81cd1a13e9",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/aarch64/sqlite-libs-3.53.4-r0.apk",
+        "version": "3.53.4-r0"
+      }
+    ],
+    "x86_64": [
+      {
+        "dependencies": "so:libc.musl-x86_64.so.1",
+        "filename": "libgcc-15.2.0-r5.apk",
+        "name": "libgcc",
+        "sha256": "393dcd32629f06d7d85409c272d142d0c082772d10b87ef55ee82f47de3be637",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/libgcc-15.2.0-r5.apk",
+        "version": "15.2.0-r5"
+      },
+      {
+        "dependencies": "so:libc.musl-x86_64.so.1",
+        "filename": "sqlite-libs-3.53.4-r0.apk",
+        "name": "sqlite-libs",
+        "sha256": "a8a216e53d22faa3f04d2e3650c1991af66f8d0b42fadff5afcdb9afb60b19e5",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/sqlite-libs-3.53.4-r0.apk",
+        "version": "3.53.4-r0"
+      }
+    ]
+  }
+}

@@ -1,0 +1,49 @@
+# Standalone durable Cursor Cloud Jobs CLI; no local SDK bridge is required.
+# Its default command prints help. Only an explicit submit starts a paid job.
+# Example: docker compose -f compose.cursor-cloud.yaml run --build --rm \
+#   -v "$PWD/job.json:/job.json:ro" jobs submit JOB_ID --spec /job.json
+services:
+  jobs:
+    image: mas-mesh:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    entrypoint: ["python", "-m", "mas_host", "jobs"]
+    command: ["--help"]
+    init: true
+    restart: "no"
+    user: "10001:10001"
+    read_only: false # Required by Compose's environment-backed secret mount.
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    cpus: "0.5"
+    mem_limit: 256m
+    memswap_limit: 256m
+    pids_limit: 32
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tmpfs:
+      - /tmp:mode=1777,size=16m
+    environment:
+      MAS_STATE_DIR: /state
+      CURSOR_API_KEY_FILE: /run/secrets/cursor_api_key
+    volumes:
+      - cursor-jobs-state:/state
+    secrets:
+      - source: cursor_api_key
+        target: cursor_api_key
+        uid: "10001"
+        gid: "10001"
+        mode: 0400
+
+volumes:
+  cursor-jobs-state:
+
+secrets:
+  cursor_api_key:
+    environment: CURSOR_API_KEY

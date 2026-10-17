@@ -1,0 +1,245 @@
+{
+  "active_load_seconds": 60.09917009199853,
+  "assumptions": [
+    "Local Linux single-host authority with durable SQLite and real Rust binaries.",
+    "Two principals submit equal single-call leaves at a combined rate at most two per second.",
+    "Each callback waits 100 ms locally and reserves zero micro-US dollars; no network provider.",
+    "Cold task execution is included; dispatcher startup is reported separately.",
+    "Process/RSS samples can miss peaks between 100 ms observations.",
+    "RSS sums shared pages repeatedly; the observer and its descendants are reported separately.",
+    "State retains completed runs; bounded linear growth is expected and is not a memory leak.",
+    "Fixed regression ceilings qualify this fixture only, not production latency or capacity.",
+    "Separate gates cover fault recovery, parallel compositions, transport and HA."
+  ],
+  "callbacks": {
+    "capacity_observation_within_policy": true,
+    "completion_minus_callback_wait_seconds": {
+      "maximum": 0.35046258300280897,
+      "minimum": 0.3284505999981775,
+      "p50": 0.33527335999679053,
+      "p95": 0.3440104500041343,
+      "p99": 0.3498905680025928,
+      "quantile_method": "nearest_rank",
+      "samples": 112
+    },
+    "peak_active_callbacks": 1,
+    "peak_active_callbacks_by_principal": {
+      "alice": 1,
+      "bob": 1
+    },
+    "simulated_provider_wait_seconds": {
+      "maximum": 0.10170110499893781,
+      "minimum": 0.10017133800283773,
+      "p50": 0.1002266149953357,
+      "p95": 0.10043269000016153,
+      "p99": 0.10167811300198082,
+      "quantile_method": "nearest_rank",
+      "samples": 112
+    },
+    "submission_to_callback_start_seconds": {
+      "maximum": 0.29490606900071725,
+      "minimum": 0.2156652940029744,
+      "p50": 0.24524685899814358,
+      "p95": 0.2821041269999114,
+      "p99": 0.28852871699928073,
+      "quantile_method": "nearest_rank",
+      "samples": 112
+    },
+    "valid_exact_once_pairs": true
+  },
+  "checks": {
+    "all_observed_descendants_reaped": true,
+    "all_submissions_completed": true,
+    "both_principals_progressed": true,
+    "cleanup_within_fixture_bound": true,
+    "completion_p99_within_fixture_ceiling": true,
+    "control_p99_within_fixture_ceiling": true,
+    "effect_trace_exact_once": true,
+    "four_slots_admitted": true,
+    "global_capacity_denied": true,
+    "minimum_active_load_duration": true,
+    "minimum_completed_samples": true,
+    "no_paid_reservations": true,
+    "observed_callback_capacity": true,
+    "observer_growth_within_limit": true,
+    "one_admission_and_call_per_submission": true,
+    "principal_capacity_denied": true,
+    "process_peak_within_limit": true,
+    "released_capacity_reusable": true,
+    "retained_state_growth_within_limit": true,
+    "round_robin_fifo": true,
+    "rss_peak_within_limit": true,
+    "source_and_binaries_stable": true,
+    "state_below_deployment_ceiling": true
+  },
+  "cleanup_seconds": 0.032784565999463666,
+  "completed_by_principal": {
+    "alice": 56,
+    "bob": 56
+  },
+  "completed_per_second": 1.860456589670562,
+  "deployment_policy": {
+    "max_calls": 10000,
+    "max_reserved_microusd": 100000000,
+    "max_runs": 1000,
+    "max_state_bytes": 1073741824,
+    "min_free_bytes": 67108864,
+    "per_call_reservation_microusd": 100000
+  },
+  "deployment_usage": {
+    "calls": 112,
+    "reserved_microusd": 0,
+    "runs": 112
+  },
+  "deterministic_capacity_checks": {
+    "four_slots_admitted": true,
+    "global_capacity_denied": true,
+    "principal_capacity_denied": true,
+    "released_capacity_reusable": true,
+    "round_robin_fifo": true
+  },
+  "dispatcher_startup_seconds": 0.18696756700228434,
+  "elapsed_to_drain_seconds": 60.20027590099926,
+  "failures": [],
+  "final_processes": {
+    "descendant_processes": 0,
+    "descendant_rss_bytes": 0,
+    "descendant_threads": 0,
+    "distinct_descendants_observed": 373,
+    "observed_orphans": 0,
+    "observer_rss_bytes": 30261248
+  },
+  "final_provenance": {
+    "binaries": {
+      "MAS_BIN": {
+        "bytes": 3526752,
+        "sha256": "c0db2e575fb2570913a92e2ea132d8f6ef13a796bd5f3b61c8ed33978e5df5b7"
+      },
+      "MAS_GATEWAY_BIN": {
+        "bytes": 3591200,
+        "sha256": "68a7b691df414796623026177e30af1ca191ac7f8c5db1b42b24b3ad96542e9b"
+      }
+    },
+    "cpu_affinity_count": 9,
+    "cpu_count": 9,
+    "expected_commit_checked": false,
+    "page_size": 4096,
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "source_clean": true,
+    "source_commit": "c623904660e17c5ce4c552246d67e4fa90bc8290",
+    "visible_system_memory_bytes": 10451464192
+  },
+  "format": "mas-reference-load/1",
+  "initial_filesystem_available_bytes": 20588081152,
+  "latency_seconds": {
+    "inspect": {
+      "maximum": 0.022497721001855098,
+      "minimum": 0.0022662379997200333,
+      "p50": 0.0025996780022978783,
+      "p95": 0.0039811080059735104,
+      "p99": 0.006052358003216796,
+      "quantile_method": "nearest_rank",
+      "samples": 448
+    },
+    "submission_to_completion_observation": {
+      "maximum": 0.4506665070002782,
+      "minimum": 0.42870734699681634,
+      "p50": 0.4354948710024473,
+      "p95": 0.44488685300166253,
+      "p99": 0.4503814380004769,
+      "quantile_method": "nearest_rank",
+      "samples": 112
+    },
+    "submit": {
+      "maximum": 0.02664856800402049,
+      "minimum": 0.015189343997917604,
+      "p50": 0.018899681999755558,
+      "p95": 0.02377703600359382,
+      "p99": 0.026226458001474384,
+      "quantile_method": "nearest_rank",
+      "samples": 112
+    }
+  },
+  "passed": true,
+  "profile": {
+    "maximum_cleanup_seconds": 30,
+    "maximum_completion_p99_seconds": 60,
+    "maximum_control_p99_seconds": 2,
+    "maximum_descendant_processes": 64,
+    "maximum_descendant_rss_bytes": 2147483648,
+    "maximum_drain_seconds": 60,
+    "maximum_load_seconds": 180,
+    "maximum_observer_growth_bytes": 67108864,
+    "maximum_state_base_bytes": 16777216,
+    "maximum_state_bytes_per_run": 2097152,
+    "maximum_submissions": 256,
+    "minimum_completed": 100,
+    "minimum_load_seconds": 60,
+    "name": "local-leaf-two-principals/1",
+    "outstanding_per_principal": 8,
+    "sample_interval_ms": 100,
+    "submissions_per_second": 2,
+    "workers": 4,
+    "workers_per_principal": 2
+  },
+  "provenance": {
+    "binaries": {
+      "MAS_BIN": {
+        "bytes": 3526752,
+        "sha256": "c0db2e575fb2570913a92e2ea132d8f6ef13a796bd5f3b61c8ed33978e5df5b7"
+      },
+      "MAS_GATEWAY_BIN": {
+        "bytes": 3591200,
+        "sha256": "68a7b691df414796623026177e30af1ca191ac7f8c5db1b42b24b3ad96542e9b"
+      }
+    },
+    "cpu_affinity_count": 9,
+    "cpu_count": 9,
+    "expected_commit_checked": true,
+    "page_size": 4096,
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "source_clean": true,
+    "source_commit": "c623904660e17c5ce4c552246d67e4fa90bc8290",
+    "visible_system_memory_bytes": 10451464192
+  },
+  "qualification": true,
+  "resource_baseline": {
+    "allocated_bytes": 253952,
+    "apparent_bytes": 253952,
+    "descendant_processes": 0,
+    "descendant_rss_bytes": 0,
+    "descendant_threads": 0,
+    "distinct_descendants_observed": 0,
+    "files": 8,
+    "observed_orphans": 0,
+    "observer_rss_bytes": 29605888
+  },
+  "resource_peaks": {
+    "descendant_processes": 5,
+    "descendant_rss_bytes": 99282944,
+    "descendant_threads": 5,
+    "distinct_descendants_observed": 373,
+    "observed_orphans": 0,
+    "observer_rss_bytes": 30261248
+  },
+  "retained_evidence": {
+    "host_regression_suite_ran_concurrently": true,
+    "kind": "bounded aggregate receipt; raw sample series kept in execution evidence",
+    "raw_report_bytes": 208479,
+    "raw_report_sha256": "f049230243e66aa5f7c09390f5b8947c32a4a6b906ba45e10f1f535dee8f53ba",
+    "sample_count": 560
+  },
+  "retained_state": {
+    "allocated_bytes": 13197312,
+    "apparent_bytes": 11529483,
+    "files": 1027
+  },
+  "retained_state_growth": {
+    "allocated_bytes": 12943360,
+    "apparent_bytes": 11275531,
+    "files": 1019
+  },
+  "submitted": 112
+}
