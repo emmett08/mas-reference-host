@@ -161,6 +161,7 @@ class HTTPPolicyTLSIntegrationTests(unittest.TestCase):
         server.tunnels = {}
         if tls:
             context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            context.minimum_version = ssl.TLSVersion.TLSv1_2
             context.load_cert_chain(self.cert, self.key)
             server.socket = context.wrap_socket(server.socket, server_side=True)
         thread = threading.Thread(target=server.serve_forever,
@@ -263,4 +264,3 @@ class HTTPPolicyTLSIntegrationTests(unittest.TestCase):
         self.assertNotIn('Proxy-Authorization', origin.requests[0][1])
         with self.assertRaisesRegex(ServiceError, 'transport failure'):
             http_exchange(f'https://wrong.invalid:{origin.server_port}', transport_policy=policy)
-
