@@ -30,8 +30,9 @@ idna==3.20 \
 jiter==0.17.0 \
     --hash=sha256:523c499235fb65add25d4bb01b1c4709ce695efdc7deb6c0a7bc515b5c44e0fb \
     --hash=sha256:dc0288ce39190ee33fe6e4ec73161eed34e7e2da509b525546ca061778d62b64
-jsonpatch==1.35 \
-    --hash=sha256:417e05303ebf7aef98d3ebf1e1ae7e7a4de6ec57bc5d243cd3509eff650e959f
+jsonpatch==1.36 \
+    --hash=sha256:7e110cb3c5a1c8768f7170bf8fb9887c4aa575fba74c95239e868b494bd9a522 \
+    --hash=sha256:aa3ffbc15816644ffcc6b13712dacbc99f6f6dde302abc66983f9831d35630a5
 jsonpointer==3.2.1 \
     --hash=sha256:b19ee68644e9ffb51440448d8f7811af2b7406eea1db90603e93f5849323119a
 jsonschema==4.26.0 \
