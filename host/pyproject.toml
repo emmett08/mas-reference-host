@@ -16,7 +16,7 @@ Issues = "https://github.com/emmett08/mas-reference-host/issues"
 
 [project.optional-dependencies]
 openai = ["openai==3.31.0"]
-cursor = ["cursor-sdk==1.0.37"]
+cursor = ["cursor-sdk==1.0.40"]
 temporal = ["temporalio==1.34.0"]
 langgraph = ["langgraph==1.2.15"]
 bridges = ["jsonschema==4.26.0"]
