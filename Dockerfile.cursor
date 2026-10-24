@@ -49,7 +49,7 @@ RUN --network=none python -m pip install --no-cache-dir --no-index --find-links=
     && PYTHONPATH=/runtime-python python -c 'from pathlib import Path; import cursor_sdk; p=Path(cursor_sdk.__file__).parent/"_vendor"/"bridge"/"bin"; [(p/n).chmod(0o755) for n in ("node", "cursor-sdk-bridge")]' \
     && mv /runtime-python/bin /runtime-bin
 
-FROM cgr.dev/chainguard/wolfi-base@sha256:256c88bb066424045021090932d50be93c8e3f2ce3586707702a401b146f3e43
+FROM cgr.dev/chainguard/wolfi-base@sha256:360896efb0753a5701c48f860e17130c205eae5a264797aa3e7ea126ee2923a7
 USER 0:0
 LABEL org.opencontainers.image.source="https://github.com/emmett08/mas-reference-host"
 ENV PYTHONDONTWRITEBYTECODE=1 \
