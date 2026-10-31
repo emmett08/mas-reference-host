@@ -48,8 +48,9 @@ langgraph-checkpoint==4.3.0 \
     --hash=sha256:bedfafe2f997ded60e4fa593e79f56f436a6e45586392dc382aa810d0c751c64
 langgraph-prebuilt==1.1.0 \
     --hash=sha256:51e311747d755b751d5c6b39b0c1446124d3a7643d2515017e6714b323508fc9
-langgraph-sdk==0.4.7 \
-    --hash=sha256:a005c7ac662c318a3405e436e9effaa90c05343f9f4ae9e11dca19c9369727dd
+langgraph-sdk==0.4.10 \
+    --hash=sha256:306ede340814e79332812e3b5a8bda2587a09657c95e14e5c7af3370e06c22fe \
+    --hash=sha256:d8d7afd326b4df42ddc0878b7fbf53f03c3237c664c236bf5bac4ab16fc38ed9
 langsmith==0.14.8 \
     --hash=sha256:bda7ec3d74bc5af3244c90920e924efcf99a700638860bf87d0231bfdb4f4ce4
 nexus-rpc==1.4.0 \
